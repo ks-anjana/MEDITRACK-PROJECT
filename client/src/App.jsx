@@ -1,103 +1,88 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { Routes, Route, Navigate } from 'react-router-dom';
+
+// Context
+import { AlertProvider, useAlerts } from './context/AlertContext';
+
+// Components
+import GlobalAlertModal from './components/GlobalAlertModal';
 
 // Pages
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import Welcome from './pages/Welcome';
 import UserDashboard from './pages/UserDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import MedicineScheduler from './pages/MedicineScheduler';
 import AppointmentTracker from './pages/AppointmentTracker';
 import PrescriptionUpload from './pages/PrescriptionUpload';
+import HealthTips from './pages/HealthTips';
+import Feedback from './pages/Feedback';
+import AdminHealthTips from './pages/admin/AdminHealthTips';
+import AdminAds from './pages/admin/AdminAds';
+import AdminFeedback from './pages/admin/AdminFeedback';
 
-// Protected Route Component
-import ProtectedRoute from './components/ProtectedRoute';
-
-// App Content (inside Router context)
 const AppContent = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { alerts, dismissAlerts } = useAlerts();
 
   return (
-    <Routes>
+    <>
+      <Routes>
+      {/* Default */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
+
       {/* Public Routes */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/welcome" element={<Welcome />} />
 
-      {/* Protected Routes - User */}
-      <Route
-        path="/user-dashboard"
-        element={
-          <ProtectedRoute requiredRole="user">
-            <UserDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/medicine-scheduler"
-        element={
-          <ProtectedRoute requiredRole="user">
-            <MedicineScheduler />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/appointment-tracker"
-        element={
-          <ProtectedRoute requiredRole="user">
-            <AppointmentTracker />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/prescription-upload"
-        element={
-          <ProtectedRoute requiredRole="user">
-            <PrescriptionUpload />
-          </ProtectedRoute>
-        }
-      />
+      {/* User Routes */}
+      <Route path="/user-dashboard" element={<UserDashboard />} />
+      <Route path="/medicine-scheduler" element={<MedicineScheduler />} />
+      <Route path="/appointment-tracker" element={<AppointmentTracker />} />
+      <Route path="/prescription-upload" element={<PrescriptionUpload />} />
+      <Route path="/health-tips" element={<HealthTips />} />
+      <Route path="/feedback" element={<Feedback />} />
 
-      {/* Protected Routes - Admin */}
+      {/* Admin Routes - All variations */}
+      <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      <Route path="/admin/health-tips" element={<AdminHealthTips />} />
+      <Route path="/admin/advertisements" element={<AdminAds />} />
+      <Route path="/admin/ads" element={<AdminAds />} />
+      <Route path="/admin/feedback" element={<AdminFeedback />} />
+
+      {/* Fallback 404 */}
       <Route
-        path="/admin-dashboard"
+        path="*"
         element={
-          <ProtectedRoute requiredRole="admin">
-            <AdminDashboard />
-          </ProtectedRoute>
+          <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="text-center">
+              <h1 className="text-6xl font-bold text-gray-800 mb-4">404</h1>
+              <p className="text-xl text-gray-600 mb-6">Page Not Found</p>
+              <a
+                href="/user-dashboard"
+                className="btn-primary"
+              >
+                Go to Dashboard
+              </a>
+            </div>
+          </div>
         }
       />
-
-      {/* Default Route */}
-      <Route
-        path="/"
-        element={
-          isAuthenticated ? (
-            user?.role === 'admin' ? (
-              <Navigate to="/admin-dashboard" />
-            ) : (
-              <Navigate to="/user-dashboard" />
-            )
-          ) : (
-            <Navigate to="/login" />
-          )
-        }
-      />
-
-      {/* 404 - Not Found */}
-      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
+    
+    {/* Global Alert Modal - Shows on all pages */}
+    <GlobalAlertModal alerts={alerts} onClose={dismissAlerts} />
+    </>
   );
 };
 
-// Main App Component
 const App = () => {
   return (
-    <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </Router>
+    <AlertProvider>
+      <AppContent />
+    </AlertProvider>
   );
 };
 

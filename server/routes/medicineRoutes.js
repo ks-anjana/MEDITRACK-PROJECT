@@ -2,7 +2,7 @@ const express = require('express');
 const authMiddleware = require('../middleware/authMiddleware');
 const {
   addMedicine,
-  getMedicines,
+  getUserMedicines,
   deleteMedicine,
 } = require('../controllers/medicineController');
 
@@ -19,7 +19,7 @@ router.post('/', addMedicine);
 // @route   GET /api/medicine
 // @desc    Get all medicines for a user
 // @access  Private
-router.get('/', getMedicines);
+router.get('/', getUserMedicines);
 
 // @route   DELETE /api/medicine/:medicineId
 // @desc    Delete a medicine

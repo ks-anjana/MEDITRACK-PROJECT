@@ -1,36 +1,20 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Navigate } from 'react-router-dom';
+import { isAuthenticated, isAdmin } from '../utils/auth';
 
-// Protected Route Component - ensures user is authenticated
-const ProtectedRoute = ({ children, requiredRole = null }) => {
-  const { isAuthenticated, user } = useAuth();
-  const navigate = useNavigate();
-
-  React.useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
-
-    if (requiredRole && user?.role !== requiredRole) {
-      // Redirect to appropriate dashboard
-      if (user?.role === 'admin') {
-        navigate('/admin-dashboard');
-      } else {
-        navigate('/user-dashboard');
-      }
-    }
-  }, [isAuthenticated, user, requiredRole, navigate]);
-
-  if (!isAuthenticated) {
-    return null;
+// Protected Route Component - ensures user is authenticated with correct role
+const ProtectedRoute = ({ children, requireAdmin = false }) => {
+  // Not authenticated - redirect to login
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole && user?.role !== requiredRole) {
-    return null;
+  // Admin route - check for admin role
+  if (requireAdmin && !isAdmin()) {
+    return <Navigate to="/user-dashboard" replace />;
   }
 
+  // All checks passed - render protected content
   return children;
 };
 

@@ -3,39 +3,48 @@ const Medicine = require('../models/Medicine');
 // Add medicine
 exports.addMedicine = async (req, res) => {
   try {
-    const { medicineName, time, period, foodTiming } = req.body;
+    const { medicineName, time, foodTiming } = req.body;
 
-    // Validation
-    if (!medicineName || !time || !period || !foodTiming) {
-      return res.status(400).json({ message: 'Please provide all required fields' });
+    // Strict validation
+    if (!medicineName || !time || !foodTiming) {
+      return res.status(400).json({ 
+        message: 'Please provide all fields: medicineName, time, and foodTiming' 
+      });
+    }
+
+    // Validate foodTiming enum
+    if (!['before food', 'after food'].includes(foodTiming)) {
+      return res.status(400).json({ 
+        message: 'Food timing must be either "before food" or "after food"' 
+      });
     }
 
     const medicine = await Medicine.create({
-      userId: req.user.id,
-      medicineName,
-      time,
-      period,
-      foodTiming,
+      userId: req.user._id,
+      medicineName: medicineName.trim(),
+      time: time.trim(),
+      foodTiming: foodTiming.trim()
     });
 
     res.status(201).json({
       message: 'Medicine added successfully',
-      medicine,
+      medicine
     });
   } catch (error) {
+    console.error('Add medicine error:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get all medicines for a user
+// Get user medicines
 exports.getMedicines = async (req, res) => {
   try {
-    const medicines = await Medicine.find({ userId: req.user.id });
-
-    res.status(200).json({
-      medicines,
-    });
+    const medicines = await Medicine.find({ userId: req.user._id })
+      .sort({ createdAt: -1 });
+    
+    res.json(medicines);
   } catch (error) {
+    console.error('Get medicines error:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -43,18 +52,25 @@ exports.getMedicines = async (req, res) => {
 // Delete medicine
 exports.deleteMedicine = async (req, res) => {
   try {
-    const { medicineId } = req.params;
-
-    const medicine = await Medicine.findByIdAndDelete(medicineId);
+    const medicine = await Medicine.findById(req.params.id);
 
     if (!medicine) {
       return res.status(404).json({ message: 'Medicine not found' });
     }
 
-    res.status(200).json({
-      message: 'Medicine removed successfully',
+    // Check ownership
+    if (medicine.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to delete this medicine' });
+    }
+
+    await Medicine.findByIdAndDelete(req.params.id);
+    
+    res.json({ 
+      message: 'Medicine deleted successfully',
+      id: req.params.id
     });
   } catch (error) {
+    console.error('Delete medicine error:', error);
     res.status(500).json({ message: error.message });
   }
 };

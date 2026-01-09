@@ -4,7 +4,7 @@ const path = require('path');
 const authMiddleware = require('../middleware/authMiddleware');
 const {
   uploadPrescription,
-  getPrescriptions,
+  getUserPrescriptions,
   deletePrescription,
 } = require('../controllers/prescriptionController');
 
@@ -51,7 +51,7 @@ router.post('/upload', upload.single('prescription'), uploadPrescription);
 // @route   GET /api/prescription
 // @desc    Get all prescriptions for a user
 // @access  Private
-router.get('/', getPrescriptions);
+router.get('/', getUserPrescriptions);
 
 // @route   DELETE /api/prescription/:prescriptionId
 // @desc    Delete a prescription

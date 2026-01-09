@@ -1,23 +1,23 @@
 const mongoose = require('mongoose');
 
-const PrescriptionSchema = new mongoose.Schema({
+const prescriptionSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
   },
-  fileName: {
+  imagePath: {
     type: String,
-    required: [true, 'Please provide file name'],
+    required: true,
   },
-  filePath: {
+  imageUrl: {
     type: String,
-    required: [true, 'Please provide file path'],
+    required: true,
   },
-  uploadedAt: {
+  createdAt: {
     type: Date,
     default: Date.now,
   },
 });
 
-module.exports = mongoose.model('Prescription', PrescriptionSchema);
+module.exports = mongoose.model('Prescription', prescriptionSchema);

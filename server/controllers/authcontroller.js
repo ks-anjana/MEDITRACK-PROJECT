@@ -2,30 +2,24 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
 // Generate JWT Token
-const generateToken = (id, role) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, {
-    expiresIn: '7d',
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE || '30d',
   });
 };
 
 // Register User
-const registerUser = async (req, res) => {
+const register = async (req, res) => {
   try {
-    const { name, email, password, role = 'user' } = req.body;
+    const { name, email, password } = req.body;
+
+    console.log('📝 Registration attempt:', { name, email });
 
     // Validation
     if (!name || !email || !password) {
       return res
         .status(400)
         .json({ message: 'Please provide all required fields' });
-    }
-
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: 'User already registered with this email' });
     }
 
     // Validate password length
@@ -35,61 +29,82 @@ const registerUser = async (req, res) => {
         .json({ message: 'Password must be at least 6 characters' });
     }
 
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ message: 'Account already exists' });
+    }
+
     // Create user
     const user = await User.create({
       name,
-      email,
+      email: email.toLowerCase(),
       password,
-      role,
+      role: 'user',
     });
 
-    // Generate token
-    const token = generateToken(user._id, user.role);
+    console.log('✅ User registered successfully:', user.email);
 
+    // Return success message ONLY (no token, no auto-login)
     res.status(201).json({
-      message: 'Registration Successful',
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      message: 'Registration successful! Please login to continue.',
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('❌ Registration error:', error);
+    res.status(500).json({
+      message: error.message || 'Server error during registration',
+    });
   }
 };
 
 // Login User
-const loginUser = async (req, res) => {
+const login = async (req, res) => {
   try {
-    const { email, password, role = 'user' } = req.body;
+    const { email, password, role } = req.body;
+
+    console.log('🔐 Login attempt:', { email, requestedRole: role });
 
     // Validation
     if (!email || !password) {
-      return res.status(400).json({ message: 'Please provide email and password' });
+      return res
+        .status(400)
+        .json({ message: 'Please provide email and password' });
     }
 
-    // Find user and select password
-    const user = await User.findOne({ email, role }).select('+password');
+    // Find user
+    const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid email' });
+      console.log('❌ User not found:', email);
+      return res.status(401).json({ message: 'Account does not exist' });
     }
 
     // Check password
     const isPasswordMatch = await user.matchPassword(password);
+
     if (!isPasswordMatch) {
-      return res.status(400).json({ message: 'Invalid password' });
+      console.log('❌ Invalid password for:', email);
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // Generate token
-    const token = generateToken(user._id, user.role);
+    // ROLE VALIDATION: Enforce role-based login restriction
+    if (role && user.role !== role) {
+      if (role === 'admin') {
+        console.log('❌ User account cannot login from Admin Login:', email);
+        return res.status(403).json({ message: 'This account does not have admin access' });
+      } else if (role === 'user') {
+        console.log('❌ Admin account cannot login from User Login:', email);
+        return res.status(403).json({ message: 'Admin accounts must login from Admin Login page' });
+      }
+    }
 
-    res.status(200).json({
-      message: 'Login Successful',
-      token,
+    console.log('✅ User logged in successfully:', email, '- Role:', user.role);
+
+    // Return token and user info
+    res.json({
+      token: generateToken(user._id),
       user: {
         id: user._id,
         name: user.name,
@@ -98,7 +113,10 @@ const loginUser = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('❌ Login error:', error);
+    res.status(500).json({
+      message: error.message || 'Server error during login',
+    });
   }
 };
 
@@ -124,4 +142,42 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getUserProfile };
+// Delete user account
+const deleteUserAccount = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Remove user's likes from all health tips
+    // Only remove from likedBy array (likes count is derived from array length)
+    const HealthTip = require('../models/HealthTip');
+    await HealthTip.updateMany(
+      { likedBy: userId },
+      { 
+        $pull: { likedBy: userId }
+      }
+    );
+
+    // Delete user
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({
+      message: 'Account deleted successfully',
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Export functions with correct names
+module.exports = {
+  register,
+  login,
+  getUserProfile,
+  deleteUserAccount,
+};

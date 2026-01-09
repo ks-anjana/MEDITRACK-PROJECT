@@ -1,244 +1,171 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { adminAPI } from '../services/api';
-import Button from '../components/Button';
-import Input from '../components/Input';
-import Alert from '../components/Alert';
+import { getUserName, clearAuthData, isAuthenticated, isAdmin } from '../utils/auth';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
-
-  const [healthTips, setHealthTips] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
+  const location = useLocation();
+  const adminName = getUserName();
+  const [stats, setStats] = useState({
+    userCount: 0,
+    tipsCount: 0,
+    adsCount: 0,
+    feedbackCount: 0,
+    tips: []
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const [errors, setErrors] = useState({});
-
-  // Fetch health tips on mount
   useEffect(() => {
-    seedAndFetchHealthTips();
-  }, []);
-
-  // Seed default health tips (first time only) and fetch
-  const seedAndFetchHealthTips = async () => {
-    try {
-      setLoading(true);
-      // Try to seed health tips (will do nothing if already seeded)
-      await adminAPI.seedHealthTips();
-      // Fetch all health tips
-      await fetchHealthTips();
-    } catch (error) {
-      console.error('Error seeding health tips:', error);
-      // Still try to fetch existing tips
-      await fetchHealthTips();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch health tips
-  const fetchHealthTips = async () => {
-    try {
-      const response = await adminAPI.getHealthTips();
-      setHealthTips(response.data.healthTips || []);
-    } catch (error) {
-      setErrorMessage('Failed to fetch health tips');
-      setTimeout(() => setErrorMessage(''), 3000);
-    }
-  };
-
-  // Handle input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: '',
-      }));
-    }
-  };
-
-  // Validate form
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.title.trim()) {
-      newErrors.title = 'Title is required';
-    }
-
-    if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Handle submit
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
+    if (!isAuthenticated() || !isAdmin()) {
+      navigate('/login');
       return;
     }
 
+    fetchDashboardData();
+  }, [navigate]);
+
+  const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      await adminAPI.createHealthTip(formData);
-
-      setSuccessMessage('Post Completed');
-      setFormData({
-        title: '',
-        description: '',
-      });
-
-      // Refresh health tips list
-      await fetchHealthTips();
-
-      setTimeout(() => setSuccessMessage(''), 3000);
-    } catch (error) {
-      setErrorMessage(error.response?.data?.message || 'Failed to create health tip');
-      setTimeout(() => setErrorMessage(''), 3000);
+      const response = await adminAPI.getDashboard();
+      setStats(response.data);
+      setError('');
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+      setError(err.response?.data?.message || 'Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle logout
   const handleLogout = () => {
-    logout();
+    clearAuthData();
     navigate('/login');
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-6xl mx-auto px-4 py-6 flex justify-between items-center">
-          <h1 className="text-4xl font-bold text-gray-800">Welcome Admin</h1>
-          <Button variant="danger" onClick={handleLogout}>
-            Logout
-          </Button>
-        </div>
+  const handleNavigate = (path) => {
+    navigate(path);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-xl">Loading dashboard...</div>
       </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Header */}
+      <header className="bg-gradient-to-r from-slate-800 to-slate-900 border-b-2 border-blue-600 shadow-2xl">
+        <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-white">
+            👨‍💼 Admin Dashboard
+          </h1>
+          <div className="flex items-center gap-4">
+            <span className="text-blue-300 font-semibold">Welcome, {adminName}!</span>
+            <button onClick={handleLogout} className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold shadow-md">
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        {/* Header Section */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">Health Tip Management</h2>
-          <p className="text-gray-600">
-            Create and manage health tips that are visible to all users.
-          </p>
-        </div>
-
-        {successMessage && (
-          <Alert type="success" message={successMessage} onClose={() => setSuccessMessage('')} />
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        {error && (
+          <div className="bg-red-900 border-l-4 border-red-500 text-red-200 px-4 py-3 rounded-lg mb-6 shadow-md">
+            <span className="font-semibold">{error}</span>
+          </div>
         )}
 
-        {errorMessage && (
-          <Alert type="error" message={errorMessage} onClose={() => setErrorMessage('')} />
-        )}
-
-        {/* Create Health Tip Form */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-12">
-          <h3 className="text-2xl font-bold text-gray-800 mb-6">Create New Health Tip</h3>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              label="Title"
-              type="text"
-              name="title"
-              placeholder="e.g., Stay Hydrated"
-              value={formData.title}
-              onChange={handleChange}
-              error={errors.title}
-              required
-            />
-
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-2">
-                Description <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                name="description"
-                placeholder="Enter detailed health tip description"
-                value={formData.description}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.description ? 'border-red-500' : 'border-gray-300'
-                }`}
-                rows="5"
-              />
-              {errors.description && (
-                <p className="error-message">{errors.description}</p>
-              )}
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Total Users Card */}
+          <div className="bg-gradient-to-br from-blue-900 to-blue-800 rounded-xl shadow-lg p-6 border border-blue-700 hover:shadow-xl transition-all duration-300">
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="text-blue-300 text-sm font-semibold">Total Users</div>
+                <div className="text-4xl font-bold text-white mt-2">{stats.userCount}</div>
+              </div>
+              <div className="text-4xl">👥</div>
             </div>
+            <div className="text-xs text-blue-300 mt-4">Active users in system</div>
+          </div>
 
-            <Button
-              variant="primary"
-              type="submit"
-              disabled={loading}
-              className="w-full"
-            >
-              {loading ? 'Posting...' : 'Post Health Tip'}
-            </Button>
-          </form>
+          {/* Total Health Tips Card */}
+          <div className="bg-gradient-to-br from-green-900 to-green-800 rounded-xl shadow-lg p-6 border border-green-700 hover:shadow-xl transition-all duration-300">
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="text-green-300 text-sm font-semibold">Health Tips</div>
+                <div className="text-4xl font-bold text-white mt-2">{stats.tipsCount}</div>
+              </div>
+              <div className="text-4xl">💡</div>
+            </div>
+            <div className="text-xs text-green-300 mt-4">Tips published</div>
+          </div>
+
+          {/* Total Advertisements Card */}
+          <div className="bg-gradient-to-br from-purple-900 to-purple-800 rounded-xl shadow-lg p-6 border border-blue-700 hover:shadow-xl transition-all duration-300">
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="text-blue-300 text-sm font-semibold">Advertisements</div>
+                <div className="text-4xl font-bold text-white mt-2">{stats.adsCount}</div>
+              </div>
+              <div className="text-4xl">📢</div>
+            </div>
+            <div className="text-xs text-blue-300 mt-4">Active campaigns</div>
+          </div>
+
+          {/* Total Feedback Card */}
+          <div className="bg-gradient-to-br from-orange-900 to-orange-800 rounded-xl shadow-lg p-6 border border-orange-700 hover:shadow-xl transition-all duration-300">
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="text-orange-300 text-sm font-semibold">Feedback</div>
+                <div className="text-4xl font-bold text-white mt-2">{stats.feedbackCount}</div>
+              </div>
+              <div className="text-4xl">💬</div>
+            </div>
+            <div className="text-xs text-orange-300 mt-4">User submissions</div>
+          </div>
         </div>
 
-        {/* Health Tips List */}
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h3 className="text-2xl font-bold text-gray-800 mb-6">
-            All Health Tips ({healthTips.length})
-          </h3>
-
-          {healthTips.length === 0 ? (
-            <p className="text-center text-gray-600 py-8">
-              No health tips available yet.
-            </p>
-          ) : (
-            <div className="space-y-6">
-              {healthTips.map((tip) => (
-                <div
-                  key={tip._id}
-                  className="border border-purple-200 bg-purple-50 rounded-lg p-6"
-                >
-                  <h4 className="text-xl font-bold text-purple-800 mb-2">
-                    {tip.title}
-                  </h4>
-                  <p className="text-gray-700 mb-3">{tip.description}</p>
-                  <p className="text-sm text-gray-500">
-                    Posted: {new Date(tip.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Back to Login Button */}
-        <div className="mt-8">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/login')}
-            className="w-full"
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Manage Health Tips */}
+          <div
+            className="bg-gradient-to-br from-green-900 to-green-800 rounded-xl shadow-lg p-6 border border-green-700 hover:shadow-xl hover:border-green-500 transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+            onClick={() => navigate('/admin/health-tips')}
           >
-            ← Back to Login
-          </Button>
+            <div className="text-5xl mb-4">💡</div>
+            <h3 className="text-xl font-bold text-white mb-2">Manage Health Tips</h3>
+            <p className="text-green-200 text-sm">Add, edit, and delete health tips for users</p>
+          </div>
+
+          {/* Manage Advertisements */}
+          <div
+            className="bg-gradient-to-br from-purple-900 to-purple-800 rounded-xl shadow-lg p-6 border border-blue-700 hover:shadow-xl hover:border-blue-500 transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+            onClick={() => navigate('/admin/ads')}
+          >
+            <div className="text-5xl mb-4">📢</div>
+            <h3 className="text-xl font-bold text-white mb-2">Manage Advertisements</h3>
+            <p className="text-blue-200 text-sm">Create and manage promotional campaigns</p>
+          </div>
+
+          {/* View Feedback */}
+          <div
+            className="bg-gradient-to-br from-orange-900 to-orange-800 rounded-xl shadow-lg p-6 border border-orange-700 hover:shadow-xl hover:border-orange-500 transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+            onClick={() => navigate('/admin/feedback')}
+          >
+            <div className="text-5xl mb-4">💬</div>
+            <h3 className="text-xl font-bold text-white mb-2">View User Feedback</h3>
+            <p className="text-orange-200 text-sm">Review and respond to user feedback</p>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

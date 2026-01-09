@@ -24,16 +24,8 @@ export const AuthProvider = ({ children }) => {
         role,
       });
 
-      const { token, user } = response.data;
-
-      // Save to localStorage
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-
-      // Update state
-      setToken(token);
-      setUser(user);
-
+      // Registration returns only a message, not token/user
+      // User must login separately
       return response.data;
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Registration failed';
@@ -88,6 +80,11 @@ export const AuthProvider = ({ children }) => {
     setError(null);
   }, []);
 
+  // Clear error manually
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
   // Get user from localStorage on mount
   React.useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -107,6 +104,7 @@ export const AuthProvider = ({ children }) => {
     register,
     login,
     logout,
+    clearError,
     isAuthenticated: !!token,
   };
 

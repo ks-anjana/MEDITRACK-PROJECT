@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const MedicineSchema = new mongoose.Schema({
+const medicineSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -12,18 +12,14 @@ const MedicineSchema = new mongoose.Schema({
     trim: true,
   },
   time: {
-    type: String, // Format: "HH:MM" (24-hour format)
-    required: [true, 'Please provide time'],
-  },
-  period: {
     type: String,
-    enum: ['AM', 'PM'],
-    required: [true, 'Please specify AM or PM'],
+    required: [true, 'Please provide time'],
+    trim: true,
   },
   foodTiming: {
     type: String,
-    enum: ['Before Food', 'After Food'],
-    required: [true, 'Please specify food timing'],
+    enum: ['before food', 'after food'],
+    required: [true, 'Please provide food timing'],
   },
   createdAt: {
     type: Date,
@@ -31,4 +27,4 @@ const MedicineSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('Medicine', MedicineSchema);
+module.exports = mongoose.model('Medicine', medicineSchema);

@@ -21,30 +21,46 @@ body {
 
 /* stylelint-disable */
 .btn-primary {
-  @apply px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition;
+  @apply px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 font-medium shadow-sm;
 }
 
 .btn-secondary {
-  @apply px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition;
+  @apply px-6 py-2.5 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md;
 }
 
 .btn-danger {
-  @apply px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition;
+  @apply px-6 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-medium shadow-sm hover:shadow-md;
 }
 
 .card {
-  @apply bg-white rounded-lg shadow p-6;
+  @apply bg-slate-800 rounded-xl shadow-md p-6 border border-slate-700;
 }
 
 .input-field {
-  @apply w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500;
+  @apply w-full px-4 py-2.5 border border-slate-600 bg-slate-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder-slate-400;
 }
 
 .error-message {
-  @apply text-red-500 text-sm mt-1;
+  @apply text-red-400 text-sm mt-1.5 font-medium;
 }
 
 .success-message {
-  @apply text-green-500 text-sm mt-1;
+  @apply text-purple-300 text-sm mt-1.5 font-medium;
+}
+
+/* Alert fade-in animation */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
 }
 /* stylelint-enable */

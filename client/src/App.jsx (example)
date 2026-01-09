@@ -1,0 +1,40 @@
+import ProtectedRoute from './components/ProtectedRoute';
+
+// User-only routes
+<Route 
+  path="/user-dashboard" 
+  element={
+    <ProtectedRoute requiredRole="user">
+      <UserDashboard />
+    </ProtectedRoute>
+  } 
+/>
+
+<Route 
+  path="/medicines" 
+  element={
+    <ProtectedRoute requiredRole="user">
+      <MedicineManagement />
+    </ProtectedRoute>
+  } 
+/>
+
+// Admin-only routes
+<Route 
+  path="/admin-dashboard" 
+  element={
+    <ProtectedRoute requiredRole="admin">
+      <AdminDashboard />
+    </ProtectedRoute>
+  } 
+/>
+
+// Any authenticated user (no role restriction)
+<Route 
+  path="/profile" 
+  element={
+    <ProtectedRoute>
+      <Profile />
+    </ProtectedRoute>
+  } 
+/>

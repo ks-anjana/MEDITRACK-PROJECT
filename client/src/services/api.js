@@ -58,7 +58,7 @@ api.interceptors.response.use(
       );
       
     } else {
-      console.error('❌ Error setting up request:', error.message);
+      console.error('❌ Error setting up Request:', error.message);
     }
     
     return Promise.reject(error);

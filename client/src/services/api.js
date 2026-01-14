@@ -7,17 +7,25 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10 second timeout
+  timeout: 10000,
+  withCredentials: true, // ✅ REQUIRED for CORS
 });
 
-// Request interceptor - Add token to requests
+// ===============================
+// REQUEST INTERCEPTOR
+// ===============================
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log(`🔵 API Request: ${config.method.toUpperCase()} ${config.baseURL}${config.url}`);
+
+    console.log(
+      `🔵 API Request: ${(config.method || 'GET').toUpperCase()} ${config.baseURL}${config.url}`
+    );
+
     return config;
   },
   (error) => {
@@ -26,62 +34,55 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor - Handle errors
+// ===============================
+// RESPONSE INTERCEPTOR
+// ===============================
 api.interceptors.response.use(
   (response) => {
-    console.log(`✅ API Response: ${response.config.method.toUpperCase()} ${response.config.url} - Status: ${response.status}`);
+    console.log(
+      `✅ API Response: ${(response.config.method || 'GET').toUpperCase()} ${
+        response.config.url
+      } - Status: ${response.status}`
+    );
     return response;
   },
   (error) => {
-    // Log the error details
     if (error.response) {
-      console.error(`❌ API Error Response: ${error.response.status} - ${error.config.url}`);
-      console.error('Error data:', error.response.data);
-      
-      // Handle 401 Unauthorized
+      console.error(
+        `❌ API Error ${error.response.status} → ${error.config?.url}`
+      );
+      console.error('Response:', error.response.data);
+
       if (error.response.status === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+
+        if (!['/login', '/register'].includes(window.location.pathname)) {
           window.location.href = '/login';
         }
       }
-      
-      // Handle 404 Not Found
-      if (error.response.status === 404) {
-        console.error('❌ Route not found on backend:', error.config.url);
-      }
     } else if (error.request) {
-      console.error('❌ No response from server:', error.request);
-      console.error(
-        "Make sure backend server is reachable (Render in production, localhost in dev)"
-      );
-      
+      console.error('❌ No response from server');
+      console.error('Base URL:', API_BASE_URL);
     } else {
-      console.error('❌ Error setting up Request:', error.message);
+      console.error('❌ Axios error:', error.message);
     }
-    
+
     return Promise.reject(error);
   }
 );
 
-// Auth API
+// ===============================
+// AUTH API
+// ===============================
 export const authAPI = {
-  register: (data) => {
-    console.log('📤 Registering user:', { ...data, password: '***' });
-    return api.post('/auth/register', data);
-  },
-  login: (data) => {
-    console.log('📤 Logging in user:', { email: data.email, password: '***' });
-    return api.post('/auth/login', data);
-  },
-  testConnection: () => {
-    console.log('🔍 Testing auth connection...');
-    return api.get('/auth/test');
-  },
+  register: (data) => api.post('/auth/register', data),
+  login: (data) => api.post('/auth/login', data),
 };
 
-// Admin API
+// ===============================
+// ADMIN API
+// ===============================
 export const adminAPI = {
   login: (data) => api.post('/auth/login', data),
   getDashboard: () => api.get('/users/admin/stats'),
@@ -90,7 +91,9 @@ export const adminAPI = {
   getFeedbacks: () => api.get('/feedback'),
 };
 
-// Medicine API
+// ===============================
+// MEDICINE API
+// ===============================
 export const medicineAPI = {
   getAll: () => api.get('/medicines'),
   add: (data) => api.post('/medicines', data),
@@ -98,7 +101,9 @@ export const medicineAPI = {
   checkAlerts: () => api.get('/medicines/alerts/check'),
 };
 
-// Appointment API
+// ===============================
+// APPOINTMENT API
+// ===============================
 export const appointmentAPI = {
   getAll: () => api.get('/appointments'),
   add: (data) => api.post('/appointments', data),
@@ -106,20 +111,21 @@ export const appointmentAPI = {
   checkAlerts: () => api.get('/appointments/alerts/check'),
 };
 
-// Prescription API
+// ===============================
+// PRESCRIPTION API
+// ===============================
 export const prescriptionAPI = {
   getAll: () => api.get('/prescriptions'),
-  upload: (formData) => {
-    return api.post('/prescriptions', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-  },
+  upload: (formData) =>
+    api.post('/prescriptions', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
   delete: (id) => api.delete(`/prescriptions/${id}`),
 };
 
-// Health Tips API
+// ===============================
+// HEALTH TIPS API
+// ===============================
 export const healthTipAPI = {
   getAll: () => api.get('/health-tips'),
   add: (data) => api.post('/health-tips', data),
@@ -128,14 +134,18 @@ export const healthTipAPI = {
   like: (id) => api.post(`/health-tips/${id}/like`),
 };
 
-// Advertisement API
+// ===============================
+// ADVERTISEMENT API
+// ===============================
 export const advertisementAPI = {
   getAll: () => api.get('/advertisements'),
   add: (data) => api.post('/advertisements', data),
   delete: (id) => api.delete(`/advertisements/${id}`),
 };
 
-// Feedback API
+// ===============================
+// FEEDBACK API
+// ===============================
 export const feedbackAPI = {
   getAll: () => api.get('/feedback'),
   submit: (data) => api.post('/feedback', data),
@@ -144,13 +154,17 @@ export const feedbackAPI = {
   deleteReply: (id) => api.delete(`/feedback/${id}/reply`),
 };
 
-// User API
+// ===============================
+// USER API
+// ===============================
 export const userAPI = {
   deleteAccount: () => api.delete('/users/me'),
   getAdminStats: () => api.get('/users/admin/stats'),
 };
 
-// Notification API (FCM)
+// ===============================
+// NOTIFICATION API
+// ===============================
 export const notificationAPI = {
   registerToken: (data) => api.post('/notifications/token', data),
   send: (data) => api.post('/notifications/send', data),

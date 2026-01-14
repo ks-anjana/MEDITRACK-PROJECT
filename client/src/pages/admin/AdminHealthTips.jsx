@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../../config/apiConfig';
+import API_BASE_URL from '../../config/apiConfig';
 import { isAuthenticated, isAdmin, clearAuthData } from '../../utils/auth';
 
 const AdminHealthTips = () => {

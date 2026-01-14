@@ -1,4 +1,5 @@
 const Advertisement = require('../models/Advertisement');
+const User = require('../models/User.js');
 
 // Get all advertisements
 exports.getAdvertisements = async (req, res) => {
@@ -24,7 +25,7 @@ exports.addAdvertisement = async (req, res) => {
     }
 
     // Check if there are any users in the system
-    const User = require('../models/User');
+    const User = require('../models/User.js');
     const userCount = await User.countDocuments({ role: 'user' });
     
     if (userCount === 0) {

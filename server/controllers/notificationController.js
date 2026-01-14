@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require('../models/User.js');
 const { sendPushNotification, uniqueTokens } = require('../utils/pushNotifier');
 
 // Save or update FCM token for the authenticated user

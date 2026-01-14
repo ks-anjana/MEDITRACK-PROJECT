@@ -1,5 +1,5 @@
 const HealthTip = require('../models/HealthTip');
-const User = require('../models/User');
+const User = require("../models/User.js");
 const Ad = require('../models/Ad');
 
 // Create health tip (Admin only)

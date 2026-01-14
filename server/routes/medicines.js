@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { addMedicine, getMedicines, deleteMedicine } = require('../controllers/medicineController');
-const { protect } = require('../middleware/auth');
+const auth = require("../middleware/auth.js");
 const { getMedicineAlerts } = require('../utils/cronJobs');
 
 // Medicine CRUD routes

@@ -1,4 +1,5 @@
 const HealthTip = require('../models/HealthTip');
+const User = require('../models/User.js');
 
 // Get all health tips
 exports.getHealthTips = async (req, res) => {
@@ -171,7 +172,7 @@ exports.sendTipsToUsers = async (req, res) => {
     }
 
     // Check if there are any users in the system
-    const User = require('../models/User');
+    const User = require('../models/User.js');
     const userCount = await User.countDocuments({ role: 'user' });
     
     if (userCount === 0) {

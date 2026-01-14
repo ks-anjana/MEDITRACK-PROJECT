@@ -237,3 +237,31 @@ process.on('SIGINT', () => {
   console.log('👋 SIGINT received');
   server.close(() => process.exit(0));
 });
+const cors = require("cors");
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://meditrack-project.vercel.app",
+  "https://meditrack-project-59b0syv74-anjanas-projects-6cd71d05.vercel.app",
+  "https://meditrack-project-insuqyov-anjanas-projects-6cd71d05.vercel.app"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow server-to-server, curl, postman
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("CORS blocked: " + origin));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+// IMPORTANT: Preflight
+app.options("*", cors());

@@ -59,7 +59,7 @@ const Feedback = () => {
       // Refresh feedback list
       await fetchFeedbacks();
       
-      setTimeout(() => setSuccess(''), 5000);
+      setTimeout(() => setSuccess(''), 5001);
     } catch (err) {
       console.error('Error submitting feedback:', err);
       setError(err.response?.data?.message || 'Failed to submit feedback. Please try again.');

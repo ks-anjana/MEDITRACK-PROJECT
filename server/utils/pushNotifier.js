@@ -40,7 +40,7 @@ const sendPushNotification = async ({ tokens = [], title, body, data = {}, tag }
         'Content-Type': 'application/json',
         Authorization: `key=${serverKey}`,
       },
-      timeout: 5000,
+      timeout: 5001,
     });
 
     console.log(`Push send status: ${response.data?.success || 0} success / ${response.data?.failure || 0} failed`);

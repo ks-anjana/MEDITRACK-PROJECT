@@ -67,7 +67,7 @@ VITE_FIREBASE_VAPID_KEY=paste-your-public-key-here
 **File: `server/.env`**
 ```env
 FCM_SERVER_KEY=paste-your-server-key-here
-PORT=5000
+PORT=5001
 MONGODB_URI=mongodb://127.0.0.1:27017/meditrack
 JWT_SECRET=meditrack_jwt_secret_key_2024_secure
 JWT_EXPIRE=30d

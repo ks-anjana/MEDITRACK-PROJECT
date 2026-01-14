@@ -9,19 +9,19 @@
 
 ### 1. Created [src/config/apiConfig.js](src/config/apiConfig.js)
 **Purpose:** Central environment-aware API configuration
-- Development: Uses Vite proxy (`/api` → localhost:5000)
+- Development: Uses Vite proxy (`/api` → localhost:5001)
 - Production: Uses configurable backend URL via `VITE_API_BASE_URL` env var
-- Fallback: localhost:5000/api if env var not set
+- Fallback: localhost:5001/api if env var not set
 
 **Key Code:**
 ```javascript
 const API_BASE_URL = isDevelopment
   ? '/api' // Vite proxy in dev
-  : import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+  : import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 ```
 
 ### 2. Updated [src/services/api.js](src/services/api.js)
-**Change:** Replaced hardcoded `'http://localhost:5000/api'` with environment config import
+**Change:** Replaced hardcoded `'http://localhost:5001/api'` with environment config import
 **Result:** API client now respects environment settings
 
 ### 3. Created [.env.production](client/.env.production)
@@ -45,20 +45,20 @@ VITE_API_BASE_URL=https://your-backend-domain.com/api
 
 ### Development Flow
 1. Browser requests `/api/auth/login`
-2. Vite dev server proxy intercepts → forwards to `http://localhost:5000/api/auth/login`
+2. Vite dev server proxy intercepts → forwards to `http://localhost:5001/api/auth/login`
 3. Backend responds (CORS allows localhost:3000)
 
 ### Production Flow (Firebase Hosting)
 1. Browser requests `https://meditrack-51fcc.web.app`
-2. App loads with `API_BASE_URL = http://localhost:5000/api` (or configured URL)
-3. Browser requests `http://localhost:5000/api/auth/login`
+2. App loads with `API_BASE_URL = http://localhost:5001/api` (or configured URL)
+3. Browser requests `http://localhost:5001/api/auth/login`
 4. Backend responds (CORS now allows Firebase Hosting domains)
 
 ## Testing
 
 ### Local Testing
 - npm run dev (frontend on :3000 with proxy)
-- Backend on :5000
+- Backend on :5001
 - Should work as before
 
 ### Production Testing (Mobile on Firebase Hosting)
@@ -101,7 +101,7 @@ const allowedOrigins = [
 6. ✅ No new dependencies added
 
 ## Next Steps
-1. Backend must be running on port 5000 for production to work
+1. Backend must be running on port 5001 for production to work
 2. If deploying backend to cloud, update VITE_API_BASE_URL
 3. Test on mobile: login → dashboard navigation
 4. If issues persist, check browser console for API error logs

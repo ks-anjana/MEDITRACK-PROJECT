@@ -181,7 +181,7 @@ const AdminHealthTips = () => {
       setSelectedTipIds([]);
       
       await fetchHealthTips();
-      setTimeout(() => setSuccess(''), 5000);
+      setTimeout(() => setSuccess(''), 5001);
     } catch (err) {
       console.error('Error sending tips:', err);
       setError(err.message || 'Failed to send tips to users');

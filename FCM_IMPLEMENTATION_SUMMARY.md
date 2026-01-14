@@ -304,7 +304,7 @@ Or: "No users found to notify"
 | "FCM_SERVER_KEY not configured" | Add key to `server/.env` |
 | Notifications don't appear | Check if permission was granted |
 | Service Worker not registered | Check browser supports it (Chrome/Firefox/Safari) |
-| Token registration fails | Check backend is running on port 5000 |
+| Token registration fails | Check backend is running on port 5001 |
 | Old notifications still show on refresh | Clear `meditrack_fcm_token` from localStorage |
 
 ---

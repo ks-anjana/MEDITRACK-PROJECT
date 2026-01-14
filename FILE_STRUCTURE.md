@@ -371,7 +371,7 @@ Refresh medicine list
 cd server
 npm install
 npm run dev
-# Runs on http://localhost:5000
+# Runs on http://localhost:5001
 ```
 
 ### Just Frontend

@@ -247,7 +247,7 @@ So max wait time = 60 seconds (if alert triggers right after frontend poll)
 ```bash
 JWT_SECRET=your_secret_key
 MONGODB_URI=your_mongodb_uri
-PORT=5000
+PORT=5001
 ```
 
 ### Production Considerations

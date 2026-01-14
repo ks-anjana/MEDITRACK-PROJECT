@@ -26,7 +26,7 @@ cd MEDITRACK/server
 npm install
 npm run dev
 ```
-✅ Wait for: "Server running on port 5000"
+✅ Wait for: "Server running on port 5001"
 
 ### 2. Start Frontend (Terminal 2)
 ```bash
@@ -479,7 +479,7 @@ A: Follow the existing code patterns and add to the appropriate files.
 
 You'll know it's working when:
 
-✅ Backend starts without errors (port 5000)
+✅ Backend starts without errors (port 5001)
 ✅ Frontend loads in browser (port 3000)
 ✅ You can register a new user
 ✅ You can login and see dashboard

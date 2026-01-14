@@ -4,7 +4,7 @@ Complete API reference for MediTrack backend.
 
 ## Base URL
 ```
-http://localhost:5000/api
+http://localhost:5001/api
 ```
 
 ## Headers
@@ -522,7 +522,7 @@ const allowedOrigins = ['https://yourdomain.com'];
 
 ### Register
 ```bash
-curl -X POST http://localhost:5000/api/auth/register \
+curl -X POST http://localhost:5001/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "John Doe",
@@ -534,7 +534,7 @@ curl -X POST http://localhost:5000/api/auth/register \
 
 ### Login
 ```bash
-curl -X POST http://localhost:5000/api/auth/login \
+curl -X POST http://localhost:5001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "john@example.com",
@@ -545,7 +545,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 
 ### Add Medicine (with token)
 ```bash
-curl -X POST http://localhost:5000/api/medicine \
+curl -X POST http://localhost:5001/api/medicine \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{

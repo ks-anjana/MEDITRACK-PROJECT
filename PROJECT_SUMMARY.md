@@ -425,7 +425,7 @@ See [QUICKSTART.md](QUICKSTART.md) for step-by-step instructions.
 ```
 MONGO_URI=mongodb://localhost:27017/meditrack
 JWT_SECRET=your_super_secret_jwt_key_change_in_production
-PORT=5000
+PORT=5001
 NODE_ENV=development
 ```
 

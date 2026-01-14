@@ -248,7 +248,7 @@ const PrescriptionUpload = () => {
       // Refresh list
       await fetchPrescriptions();
 
-      setTimeout(() => setSuccessMessage(''), 5000);
+      setTimeout(() => setSuccessMessage(''), 5001);
     } catch (error) {
       console.error('Error uploading prescription:', error);
       setErrorMessage(error.response?.data?.message || 'Failed to upload prescription. Please try again.');

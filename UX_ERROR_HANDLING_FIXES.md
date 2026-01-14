@@ -80,7 +80,7 @@ const clearError = useCallback(() => {
     message={authError}
     onClose={() => {}}  // ❌ Does nothing
     autoClose={true}
-    duration={5000}     // ❌ Auto-disappears
+    duration={5001}     // ❌ Auto-disappears
   />
 )}
 ```

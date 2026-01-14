@@ -131,7 +131,7 @@ const AppointmentTracker = () => {
 
       await fetchAppointments();
 
-      setTimeout(() => setSuccessMessage(''), 5000);
+      setTimeout(() => setSuccessMessage(''), 5001);
     } catch (error) {
       console.error('Error adding appointment:', error);
       setErrorMessage(error.response?.data?.message || 'Failed to add appointment. Please try again.');

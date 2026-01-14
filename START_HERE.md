@@ -38,7 +38,7 @@ npm install
 # For Windows:
 echo MONGO_URI=mongodb://localhost:27017/meditrack > .env
 echo JWT_SECRET=your_super_secret_jwt_key_change_in_production >> .env
-echo PORT=5000 >> .env
+echo PORT=5001 >> .env
 echo NODE_ENV=development >> .env
 
 # For Mac/Linux: Edit .env manually with above values
@@ -47,7 +47,7 @@ echo NODE_ENV=development >> .env
 npm run dev
 
 # ✅ You should see:
-# Server running on port 5000
+# Server running on port 5001
 # MongoDB connected successfully
 # Cron jobs started successfully
 ```
@@ -169,7 +169,7 @@ You'll see the Login page! 🎉
 # Or use MongoDB Atlas and update MONGO_URI in .env
 ```
 
-### Problem: "Port 5000 already in use"
+### Problem: "Port 5001 already in use"
 ```bash
 # Edit server/.env and change PORT to 5001 or 5002
 ```
@@ -209,12 +209,12 @@ Using Postman or cURL:
 
 ```bash
 # Register
-curl -X POST http://localhost:5000/api/auth/register \
+curl -X POST http://localhost:5001/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"name":"Test","email":"test@example.com","password":"pass123","role":"user"}'
 
 # Login
-curl -X POST http://localhost:5000/api/auth/login \
+curl -X POST http://localhost:5001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"pass123","role":"user"}'
 ```

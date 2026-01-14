@@ -53,7 +53,7 @@ api.interceptors.response.use(
       }
     } else if (error.request) {
       console.error('❌ No response from server:', error.request);
-      console.error('Make sure backend server is running at http://localhost:5000');
+      console.error('Make sure backend server is running at http://localhost:5001');
     } else {
       console.error('❌ Error setting up request:', error.message);
     }

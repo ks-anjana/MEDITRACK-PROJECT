@@ -110,7 +110,7 @@ const MedicineScheduler = () => {
       });
       setErrors({});
 
-      setTimeout(() => setSuccessMessage(''), 5000);
+      setTimeout(() => setSuccessMessage(''), 5001);
     } catch (error) {
       console.error('Error adding medicine:', error);
       setErrorMessage(error.response?.data?.message || 'Failed to add medicine. Please try again.');

@@ -97,7 +97,7 @@
 cd server
 npm install
 npm run dev
-# Wait for: "Server running on port 5000"
+# Wait for: "Server running on port 5001"
 ```
 
 ### Step 2: Frontend
@@ -406,7 +406,7 @@ Admin dashboard → Create form → Post tip → View all → Visible to all use
 
 ### If Something Doesn't Work
 1. Check MongoDB is running
-2. Verify ports are available (5000, 3000)
+2. Verify ports are available (5001, 3000)
 3. Clear browser cache
 4. Check .env file is correct
 5. Restart both terminals

@@ -46,7 +46,7 @@ exports.uploadPrescription = async (req, res) => {
       return res.status(400).json({ message: 'Please upload an image file' });
     }
 
-    const imageUrl = `http://localhost:${process.env.PORT || 5000}/uploads/${req.file.filename}`;
+    const imageUrl = `http://localhost:${process.env.PORT || 5001}/uploads/${req.file.filename}`;
     
     const prescription = await Prescription.create({
       userId: req.user._id,

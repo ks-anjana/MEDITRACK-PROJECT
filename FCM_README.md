@@ -227,7 +227,7 @@ Overhead: <1% CPU, ~5MB memory
 | "FCM_SERVER_KEY not configured" | Add key to `server/.env` |
 | No permission popup | Check browser settings, may be blocked |
 | Notifications don't appear | Verify medicine/appointment time matches current time |
-| Token not registering | Check backend is running on port 5000 |
+| Token not registering | Check backend is running on port 5001 |
 | Service Worker not found | Clear browser cache and reload |
 
 ### See Also

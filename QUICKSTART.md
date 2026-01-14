@@ -39,20 +39,20 @@ npm install
 # Create .env file (Windows)
 echo MONGO_URI=mongodb://localhost:27017/meditrack > .env
 echo JWT_SECRET=your_super_secret_jwt_key_change_in_production >> .env
-echo PORT=5000 >> .env
+echo PORT=5001 >> .env
 echo NODE_ENV=development >> .env
 
 # For Mac/Linux, edit .env manually with:
 # MONGO_URI=mongodb://localhost:27017/meditrack
 # JWT_SECRET=your_super_secret_jwt_key_change_in_production
-# PORT=5000
+# PORT=5001
 # NODE_ENV=development
 
 # Start server
 npm run dev
 
 # Expected output:
-# Server running on port 5000
+# Server running on port 5001
 # MongoDB connected successfully
 # Cron jobs started successfully
 ```
@@ -123,7 +123,7 @@ npm run dev
 
 ### Register User
 ```bash
-curl -X POST http://localhost:5000/api/auth/register \
+curl -X POST http://localhost:5001/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "John Doe",
@@ -135,7 +135,7 @@ curl -X POST http://localhost:5000/api/auth/register \
 
 ### Login User
 ```bash
-curl -X POST http://localhost:5000/api/auth/login \
+curl -X POST http://localhost:5001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "john@example.com",
@@ -146,7 +146,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 
 ### Add Medicine (with token)
 ```bash
-curl -X POST http://localhost:5000/api/medicine \
+curl -X POST http://localhost:5001/api/medicine \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{
@@ -175,11 +175,11 @@ npm install
 # Or change MONGO_URI in .env to MongoDB Atlas cloud
 ```
 
-### "Port 5000 already in use"
+### "Port 5001 already in use"
 ```bash
-# Kill process on port 5000
-# Windows: netstat -ano | findstr :5000
-# Mac/Linux: lsof -i :5000 | grep LISTEN | awk '{print $2}' | xargs kill -9
+# Kill process on port 5001
+# Windows: netstat -ano | findstr :5001
+# Mac/Linux: lsof -i :5001 | grep LISTEN | awk '{print $2}' | xargs kill -9
 
 # Or change PORT in .env
 ```
@@ -191,7 +191,7 @@ npm install
 ```
 
 ### "CORS error when calling API"
-- Ensure backend is running on http://localhost:5000
+- Ensure backend is running on http://localhost:5001
 - Check vite.config.js proxy settings
 
 ### "Notification permission not granted"

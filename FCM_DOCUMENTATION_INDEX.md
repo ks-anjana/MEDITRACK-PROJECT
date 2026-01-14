@@ -353,7 +353,7 @@ If you want to fully understand the system, read in this order:
 | Server key missing | Add to `.env` |
 | No permission popup | Already granted, check browser settings |
 | Notifications not showing | Check cron job times match |
-| Token not registering | Check backend is running on :5000 |
+| Token not registering | Check backend is running on :5001 |
 
 See [FCM_SETUP_GUIDE.md](FCM_SETUP_GUIDE.md) **Troubleshooting** section for more.
 

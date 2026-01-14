@@ -234,7 +234,7 @@ Problem: Notifications don't appear
 Solution: Verify medicine/appointment time matches current time
 
 Problem: Token not registering
-Solution: Check backend is running on port 5000
+Solution: Check backend is running on port 5001
 
 Problem: Service Worker error
 Solution: Check browser DevTools → Application → Service Workers

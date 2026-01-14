@@ -4,52 +4,58 @@ const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
 
-// Load environment variables first
+// Load environment variables
 dotenv.config();
 
 // Initialize express app
 const app = express();
 
-// Create uploads directory
+/* =========================================================
+   ✅ CORS CONFIGURATION (CRITICAL FIX)
+========================================================= */
+
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost:5001',
+    'https://meditrack-project.vercel.app',
+    'https://meditrack-project-insuqyov-anjanas-projects-6cd71d05.vercel.app'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+// Handle preflight requests
+app.options('*', cors());
+
+/* =========================================================
+   BODY PARSERS
+========================================================= */
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+/* =========================================================
+   UPLOADS DIRECTORY
+========================================================= */
+
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
   console.log('✅ Uploads directory created');
 }
 
-// CORS configuration
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'https://meditrack-51fcc.web.app',
-  'https://meditrack-51fcc.firebaseapp.com'
-];
-
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, curl requests)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-// Body parser middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Serve static files
 app.use('/uploads', express.static(uploadDir));
 
-// Health check route
+/* =========================================================
+   HEALTH CHECK
+========================================================= */
+
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+  res.json({
+    status: 'OK',
     message: 'MediTrack API is running',
     timestamp: new Date().toISOString()
   });
@@ -57,197 +63,148 @@ app.get('/api/health', (req, res) => {
 
 console.log('\n🔧 Registering API routes...\n');
 
-// Auth routes
+/* =========================================================
+   ROUTES
+========================================================= */
+
 try {
-  const authRoutes = require('./routes/authRoutes');
-  app.use('/api/auth', authRoutes);
-  console.log('✅ [1/9] Auth routes registered: /api/auth');
-} catch (error) {
-  console.error('❌ [1/9] Auth routes failed:', error.message);
+  app.use('/api/auth', require('./routes/authRoutes'));
+  console.log('✅ [1/9] Auth routes registered');
+} catch (e) {
+  console.error('❌ Auth routes failed:', e.message);
 }
 
-// Medicine routes
 try {
-  const medicineRoutes = require('./routes/medicines');
-  app.use('/api/medicines', medicineRoutes);
-  console.log('✅ [2/9] Medicine routes registered: /api/medicines');
-} catch (error) {
-  console.error('❌ [2/9] Medicine routes failed:', error.message);
+  app.use('/api/medicines', require('./routes/medicines'));
+  console.log('✅ [2/9] Medicine routes registered');
+} catch (e) {
+  console.error('❌ Medicine routes failed:', e.message);
 }
 
-// Appointment routes
 try {
-  const appointmentRoutes = require('./routes/appointments');
-  app.use('/api/appointments', appointmentRoutes);
-  console.log('✅ [3/9] Appointment routes registered: /api/appointments');
-} catch (error) {
-  console.error('❌ [3/9] Appointment routes failed:', error.message);
+  app.use('/api/appointments', require('./routes/appointments'));
+  console.log('✅ [3/9] Appointment routes registered');
+} catch (e) {
+  console.error('❌ Appointment routes failed:', e.message);
 }
 
-// Prescription routes
 try {
-  const prescriptionRoutes = require('./routes/prescriptions');
-  app.use('/api/prescriptions', prescriptionRoutes);
-  console.log('✅ [4/9] Prescription routes registered: /api/prescriptions');
-} catch (error) {
-  console.error('❌ [4/9] Prescription routes failed:', error.message);
+  app.use('/api/prescriptions', require('./routes/prescriptions'));
+  console.log('✅ [4/9] Prescription routes registered');
+} catch (e) {
+  console.error('❌ Prescription routes failed:', e.message);
 }
 
-// Health tips routes
 try {
-  const healthTipRoutes = require('./routes/healthTips');
-  app.use('/api/health-tips', healthTipRoutes);
-  console.log('✅ [5/9] Health tips routes registered: /api/health-tips');
-} catch (error) {
-  console.error('❌ [5/9] Health tips routes failed:', error.message);
+  app.use('/api/health-tips', require('./routes/healthTips'));
+  console.log('✅ [5/9] Health tips routes registered');
+} catch (e) {
+  console.error('❌ Health tips routes failed:', e.message);
 }
 
-// Advertisement routes
 try {
-  const advertisementRoutes = require('./routes/advertisements');
-  app.use('/api/advertisements', advertisementRoutes);
-  console.log('✅ [6/9] Advertisement routes registered: /api/advertisements');
-} catch (error) {
-  console.error('❌ [6/9] Advertisement routes failed:', error.message);
+  app.use('/api/advertisements', require('./routes/advertisements'));
+  console.log('✅ [6/9] Advertisement routes registered');
+} catch (e) {
+  console.error('❌ Advertisement routes failed:', e.message);
 }
 
-// Feedback routes
 try {
-  const feedbackRoutes = require('./routes/feedback');
-  app.use('/api/feedback', feedbackRoutes);
-  console.log('✅ [7/9] Feedback routes registered: /api/feedback');
-} catch (error) {
-  console.error('❌ [7/9] Feedback routes failed:', error.message);
+  app.use('/api/feedback', require('./routes/feedback'));
+  console.log('✅ [7/9] Feedback routes registered');
+} catch (e) {
+  console.error('❌ Feedback routes failed:', e.message);
 }
 
-// User routes
 try {
-  const userRoutes = require('./routes/users');
-  app.use('/api/users', userRoutes);
-  console.log('✅ [8/9] User routes registered: /api/users');
-} catch (error) {
-  console.error('❌ [8/9] User routes failed:', error.message);
+  app.use('/api/users', require('./routes/users'));
+  console.log('✅ [8/9] User routes registered');
+} catch (e) {
+  console.error('❌ User routes failed:', e.message);
 }
 
-// Notification routes
 try {
-  const notificationRoutes = require('./routes/notifications');
-  app.use('/api/notifications', notificationRoutes);
-  console.log('✅ [9/9] Notification routes registered: /api/notifications');
-} catch (error) {
-  console.error('❌ [9/9] Notification routes failed:', error.message);
+  app.use('/api/notifications', require('./routes/notifications'));
+  console.log('✅ [9/9] Notification routes registered');
+} catch (e) {
+  console.error('❌ Notification routes failed:', e.message);
 }
 
 console.log('\n✅ All routes registration attempted\n');
 
-// 404 handler - MUST be after all routes
+/* =========================================================
+   404 HANDLER
+========================================================= */
+
 app.use((req, res) => {
-  console.log(`⚠️  404 - Route not found: ${req.method} ${req.originalUrl}`);
-  res.status(404).json({ 
+  res.status(404).json({
     message: `Route ${req.originalUrl} not found`,
-    method: req.method,
-    availableRoutes: [
-      'POST /api/auth/register',
-      'POST /api/auth/login',
-      'GET  /api/medicines',
-      'POST /api/medicines',
-      'GET  /api/appointments',
-      'POST /api/appointments',
-      'GET  /api/prescriptions',
-      'POST /api/prescriptions',
-      'GET  /api/health-tips',
-      'POST /api/health-tips',
-      'GET  /api/advertisements',
-      'POST /api/advertisements',
-      'GET  /api/feedback',
-      'POST /api/feedback',
-      'GET  /api/users/admin/stats'
-    ]
+    method: req.method
   });
 });
 
-// Global error handler
+/* =========================================================
+   GLOBAL ERROR HANDLER
+========================================================= */
+
 app.use((err, req, res, next) => {
-  console.error('❌ Global error handler:', err.message);
+  console.error('❌ Global error:', err.message);
   res.status(err.status || 500).json({
     success: false,
-    message: err.message || 'Internal Server Error',
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    message: err.message || 'Internal Server Error'
   });
 });
 
-// Server port
+/* =========================================================
+   START SERVER
+========================================================= */
+
 const PORT = process.env.PORT || 5001;
 
-// Start server first, then connect to MongoDB
 const server = app.listen(PORT, () => {
   console.log('\n🚀 ========================================');
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
   console.log(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`✅ API Base: http://localhost:${PORT}/api`);
+  console.log(`✅ API Base: /api`);
   console.log('🚀 ========================================\n');
 });
 
-// Connect to MongoDB after server starts
+/* =========================================================
+   MONGODB + CRON JOBS
+========================================================= */
+
 (async () => {
   try {
     const connectDB = require('./config/db');
     await connectDB();
-    console.log('✅ MongoDB connected successfully');
-    
-    // Seed default data after successful connection
+    console.log('✅ MongoDB connected');
+
     try {
       const { seedDefaultData } = require('./utils/seedData');
-      setTimeout(() => {
-        seedDefaultData();
-        console.log('✅ Default data seeding completed');
-      }, 2000);
-    } catch (error) {
-      console.error('⚠️  Seed data function not available:', error.message);
-    }
-    
-    // Start cron jobs after MongoDB is ready
+      setTimeout(seedDefaultData, 2000);
+    } catch {}
+
     try {
       const { startCronJobs } = require('./utils/cronJobs');
       startCronJobs();
-      console.log('✅ Cron jobs initialized for medicine & appointment reminders');
-    } catch (error) {
-      console.error('⚠️  Cron jobs not available:', error.message);
-    }
-  } catch (error) {
-    console.error('❌ MongoDB connection failed:', error.message);
-    console.error('⚠️  Server is running but database is not connected');
-    console.error('💡 Start MongoDB: net start MongoDB (Windows)');
-    console.error('💡 Or run: mongod --dbpath="C:\\data\\db"');
+      console.log('✅ Cron jobs started');
+    } catch {}
+
+  } catch (err) {
+    console.error('❌ MongoDB connection failed:', err.message);
   }
 })();
 
-// Handle unhandled promise rejections - DO NOT EXIT
-process.on('unhandledRejection', (err) => {
-  console.error('❌ UNHANDLED REJECTION:', err.message);
-  console.error('⚠️  Server continues running...');
-});
+/* =========================================================
+   SAFE SHUTDOWN
+========================================================= */
 
-// Handle uncaught exceptions - DO NOT EXIT
-process.on('uncaughtException', (err) => {
-  console.error('❌ UNCAUGHT EXCEPTION:', err.message);
-  console.error('⚠️  Server continues running...');
-});
-
-// Handle SIGTERM gracefully
 process.on('SIGTERM', () => {
-  console.log('👋 SIGTERM received. Shutting down gracefully');
-  server.close(() => {
-    console.log('✅ Process terminated');
-    process.exit(0);
-  });
+  console.log('👋 SIGTERM received');
+  server.close(() => process.exit(0));
 });
 
-// Handle CTRL+C gracefully
 process.on('SIGINT', () => {
-  console.log('\n👋 SIGINT received. Shutting down gracefully');
-  server.close(() => {
-    console.log('✅ Process terminated');
-    process.exit(0);
-  });
+  console.log('👋 SIGINT received');
+  server.close(() => process.exit(0));
 });

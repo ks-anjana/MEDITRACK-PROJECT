@@ -16,7 +16,7 @@ const register = async (req, res) => {
     console.log('📝 Registration attempt:', { name, email });
 
     // Validation
-    if (!name || !email || !password) {
+    if (!name || !email ||!password) {
       return res
         .status(400)
         .json({ message: 'Please provide all required fields' });

@@ -73,7 +73,7 @@ Only **one addition** to UI (optional):
 | File | Purpose | Type |
 |------|---------|------|
 | `server/.env` | Server key config | Configuration |
-| `server/models/user.js` | Added fcmTokens field | Modification |
+| `server/models/User.js` | Added fcmTokens field | Modification |
 | `server/controllers/notificationController.js` | Token endpoints | New Controller |
 | `server/routes/notifications.js` | Notification routes | New Routes |
 | `server/utils/pushNotifier.js` | FCM send utility | New Utility |

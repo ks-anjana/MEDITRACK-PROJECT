@@ -24,7 +24,7 @@ Your React (Vite) frontend now has full FCM integration for system-level push no
 7. **[.env.local](.env.local)** - Environment variables (VAPID key placeholder)
 
 #### Server-side (Backend)
-1. **[models/user.js](../server/models/user.js)** - Added `fcmTokens` array to store user tokens
+1. **[models/User.js](../server/models/User.js)** - Added `fcmTokens` array to store user tokens
 2. **[controllers/notificationController.js](../server/controllers/notificationController.js)** - Token registration and push endpoints
 3. **[routes/notifications.js](../server/routes/notifications.js)** - Notification API routes
 4. **[utils/pushNotifier.js](../server/utils/pushNotifier.js)** - FCM send utility (dedupes tokens)

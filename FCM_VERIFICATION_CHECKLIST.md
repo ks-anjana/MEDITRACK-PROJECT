@@ -32,7 +32,7 @@ Files Created:
 - [x] utils/pushNotifier.js - FCM send utility
 
 Files Modified:
-- [x] models/user.js - Added fcmTokens array
+- [x] models/User.js - Added fcmTokens array
 - [x] utils/cronJobs.js - Integrated FCM push for medicine/appointment alerts
 - [x] server.js - Registered notification routes
 - [x] .env - Added FCM_SERVER_KEY placeholder

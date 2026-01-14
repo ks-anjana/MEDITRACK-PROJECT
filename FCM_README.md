@@ -143,7 +143,7 @@ client/
 
 server/
   ├── .env (FCM_SERVER_KEY)
-  ├── models/user.js (fcmTokens)
+  ├── models/User.js (fcmTokens)
   ├── utils/cronJobs.js (FCM integration)
   └── server.js (routes)
 ```

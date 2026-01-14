@@ -120,7 +120,7 @@ Frontend:
 
 Backend:
   ✓ server/.env (added FCM_SERVER_KEY)
-  ✓ server/models/user.js (added fcmTokens field)
+  ✓ server/models/User.js (added fcmTokens field)
   ✓ server/utils/cronJobs.js (integrated FCM push)
   ✓ server/server.js (registered notification routes)
 

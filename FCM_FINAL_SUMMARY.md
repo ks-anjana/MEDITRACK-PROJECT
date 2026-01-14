@@ -153,7 +153,7 @@ client/
 
 server/
 ├── .env                 (FCM_SERVER_KEY added)
-├── models/user.js       (fcmTokens field added)
+├── models/User.js       (fcmTokens field added)
 ├── utils/cronJobs.js    (FCM push integrated)
 └── server.js            (routes registered)
 ```

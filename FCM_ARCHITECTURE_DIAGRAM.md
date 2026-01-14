@@ -255,7 +255,7 @@
 │  │     ├─ models/Appointment.js                                   │
 │  │     └─ utils/pushNotifier.js                                   │
 │  │                                                                 │
-│  └─ models/user.js (fcmTokens field)                              │
+│  └─ models/User.js (fcmTokens field)                              │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 

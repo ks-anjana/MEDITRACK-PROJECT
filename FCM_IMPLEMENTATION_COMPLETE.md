@@ -26,7 +26,7 @@ All code is implemented, tested, and production-ready. Only configuration needed
 - [x] Notification controller (`controllers/notificationController.js`)
 - [x] Push sender utility (`utils/pushNotifier.js`)
 - [x] Cron integration (`utils/cronJobs.js`)
-- [x] User model update (`models/user.js` - fcmTokens)
+- [x] User model update (`models/User.js` - fcmTokens)
 - [x] Route registration (`server.js`)
 - [x] Environment config (`.env`)
 
@@ -158,7 +158,7 @@ client/
 
 server/
 ├── .env (added FCM_SERVER_KEY)
-├── models/user.js (added fcmTokens)
+├── models/User.js (added fcmTokens)
 ├── utils/cronJobs.js (integrated FCM push)
 └── server.js (registered routes)
 ```

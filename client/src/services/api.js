@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:5000/api';
+import { API_BASE_URL } from '../config/apiConfig';
 
 // Create axios instance
 const api = axios.create({
@@ -146,6 +145,12 @@ export const feedbackAPI = {
 export const userAPI = {
   deleteAccount: () => api.delete('/users/me'),
   getAdminStats: () => api.get('/users/admin/stats'),
+};
+
+// Notification API (FCM)
+export const notificationAPI = {
+  registerToken: (data) => api.post('/notifications/token', data),
+  send: (data) => api.post('/notifications/send', data),
 };
 
 export default api;

@@ -18,7 +18,7 @@ const AdminAds = () => {
 
   useEffect(() => {
     if (!isAuthenticated() || !isAdmin()) {
-      navigate('/login');
+      window.location.href = '/login';
       return;
     }
     fetchAds();
@@ -114,7 +114,7 @@ const AdminAds = () => {
 
   const handleLogout = () => {
     clearAuthData();
-    navigate('/login');
+    window.location.href = '/login';
   };
 
   return (

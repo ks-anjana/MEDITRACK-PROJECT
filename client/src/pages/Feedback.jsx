@@ -17,7 +17,7 @@ const Feedback = () => {
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate('/login');
+      window.location.href = '/login';
       return;
     }
     fetchFeedbacks();

@@ -25,7 +25,7 @@ const AppointmentTracker = () => {
   // Request notification permission and fetch appointments
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate('/login');
+      window.location.href = '/login';
       return;
     }
 
@@ -172,7 +172,7 @@ const AppointmentTracker = () => {
 
   const handleLogout = () => {
     clearAuthData();
-    navigate('/login');
+    window.location.href = '/login';
   };
 
   return (

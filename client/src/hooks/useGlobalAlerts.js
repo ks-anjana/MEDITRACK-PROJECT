@@ -42,11 +42,8 @@ export const useGlobalAlerts = () => {
         }
       });
 
-      // Start alert checking immediately
-      checkAlerts();
-
-      // Set up interval to check alerts every 10 seconds (faster polling for better UX)
-      const interval = setInterval(checkAlerts, 10000);
+      // Set up interval to check alerts every 60 seconds (1 minute)
+      const interval = setInterval(checkAlerts, 60000);
       setCheckInterval(interval);
 
       // Cleanup

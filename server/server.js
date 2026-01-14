@@ -18,8 +18,22 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // CORS configuration
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'https://meditrack-51fcc.web.app',
+  'https://meditrack-51fcc.firebaseapp.com'
+];
+
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl requests)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -47,72 +61,81 @@ console.log('\n🔧 Registering API routes...\n');
 try {
   const authRoutes = require('./routes/authRoutes');
   app.use('/api/auth', authRoutes);
-  console.log('✅ [1/8] Auth routes registered: /api/auth');
+  console.log('✅ [1/9] Auth routes registered: /api/auth');
 } catch (error) {
-  console.error('❌ [1/8] Auth routes failed:', error.message);
+  console.error('❌ [1/9] Auth routes failed:', error.message);
 }
 
 // Medicine routes
 try {
   const medicineRoutes = require('./routes/medicines');
   app.use('/api/medicines', medicineRoutes);
-  console.log('✅ [2/8] Medicine routes registered: /api/medicines');
+  console.log('✅ [2/9] Medicine routes registered: /api/medicines');
 } catch (error) {
-  console.error('❌ [2/8] Medicine routes failed:', error.message);
+  console.error('❌ [2/9] Medicine routes failed:', error.message);
 }
 
 // Appointment routes
 try {
   const appointmentRoutes = require('./routes/appointments');
   app.use('/api/appointments', appointmentRoutes);
-  console.log('✅ [3/8] Appointment routes registered: /api/appointments');
+  console.log('✅ [3/9] Appointment routes registered: /api/appointments');
 } catch (error) {
-  console.error('❌ [3/8] Appointment routes failed:', error.message);
+  console.error('❌ [3/9] Appointment routes failed:', error.message);
 }
 
 // Prescription routes
 try {
   const prescriptionRoutes = require('./routes/prescriptions');
   app.use('/api/prescriptions', prescriptionRoutes);
-  console.log('✅ [4/8] Prescription routes registered: /api/prescriptions');
+  console.log('✅ [4/9] Prescription routes registered: /api/prescriptions');
 } catch (error) {
-  console.error('❌ [4/8] Prescription routes failed:', error.message);
+  console.error('❌ [4/9] Prescription routes failed:', error.message);
 }
 
 // Health tips routes
 try {
   const healthTipRoutes = require('./routes/healthTips');
   app.use('/api/health-tips', healthTipRoutes);
-  console.log('✅ [5/8] Health tips routes registered: /api/health-tips');
+  console.log('✅ [5/9] Health tips routes registered: /api/health-tips');
 } catch (error) {
-  console.error('❌ [5/8] Health tips routes failed:', error.message);
+  console.error('❌ [5/9] Health tips routes failed:', error.message);
 }
 
 // Advertisement routes
 try {
   const advertisementRoutes = require('./routes/advertisements');
   app.use('/api/advertisements', advertisementRoutes);
-  console.log('✅ [6/8] Advertisement routes registered: /api/advertisements');
+  console.log('✅ [6/9] Advertisement routes registered: /api/advertisements');
 } catch (error) {
-  console.error('❌ [6/8] Advertisement routes failed:', error.message);
+  console.error('❌ [6/9] Advertisement routes failed:', error.message);
 }
 
 // Feedback routes
 try {
   const feedbackRoutes = require('./routes/feedback');
   app.use('/api/feedback', feedbackRoutes);
-  console.log('✅ [7/8] Feedback routes registered: /api/feedback');
+  console.log('✅ [7/9] Feedback routes registered: /api/feedback');
 } catch (error) {
-  console.error('❌ [7/8] Feedback routes failed:', error.message);
+  console.error('❌ [7/9] Feedback routes failed:', error.message);
 }
 
 // User routes
 try {
   const userRoutes = require('./routes/users');
   app.use('/api/users', userRoutes);
-  console.log('✅ [8/8] User routes registered: /api/users');
+  console.log('✅ [8/9] User routes registered: /api/users');
 } catch (error) {
-  console.error('❌ [8/8] User routes failed:', error.message);
+  console.error('❌ [8/9] User routes failed:', error.message);
+}
+
+// Notification routes
+try {
+  const notificationRoutes = require('./routes/notifications');
+  app.use('/api/notifications', notificationRoutes);
+  console.log('✅ [9/9] Notification routes registered: /api/notifications');
+} catch (error) {
+  console.error('❌ [9/9] Notification routes failed:', error.message);
 }
 
 console.log('\n✅ All routes registration attempted\n');

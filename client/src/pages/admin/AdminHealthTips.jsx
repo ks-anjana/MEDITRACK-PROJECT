@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { healthTipAPI } from '../../services/api';
+import { API_BASE_URL } from '../../config/apiConfig';
 import { isAuthenticated, isAdmin, clearAuthData } from '../../utils/auth';
 
 const AdminHealthTips = () => {
@@ -19,7 +19,7 @@ const AdminHealthTips = () => {
 
   useEffect(() => {
     if (!isAuthenticated() || !isAdmin()) {
-      navigate('/login');
+      window.location.href = '/login';
       return;
     }
     fetchHealthTips();
@@ -161,7 +161,7 @@ const AdminHealthTips = () => {
       setSuccess('');
 
       // Call the backend endpoint
-      const response = await fetch('http://localhost:5000/api/health-tips/send/users', {
+      const response = await fetch(`${API_BASE_URL}/health-tips/send/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -192,7 +192,7 @@ const AdminHealthTips = () => {
 
   const handleLogout = () => {
     clearAuthData();
-    navigate('/login');
+    window.location.href = '/login';
   };
 
   return (

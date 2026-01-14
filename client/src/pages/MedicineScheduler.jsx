@@ -24,7 +24,7 @@ const MedicineScheduler = () => {
   // Request notification permission on mount
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate('/login');
+      window.location.href = '/login';
       return;
     }
 

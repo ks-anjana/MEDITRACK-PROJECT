@@ -21,9 +21,11 @@ import Feedback from './pages/Feedback';
 import AdminHealthTips from './pages/admin/AdminHealthTips';
 import AdminAds from './pages/admin/AdminAds';
 import AdminFeedback from './pages/admin/AdminFeedback';
+import useFcmRegistration from './hooks/useFcmRegistration';
 
 const AppContent = () => {
   const { alerts, dismissAlerts } = useAlerts();
+  useFcmRegistration();
 
   return (
     <>

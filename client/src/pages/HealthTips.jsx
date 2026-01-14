@@ -13,7 +13,7 @@ const HealthTips = () => {
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate('/login');
+      window.location.href = '/login';
       return;
     }
     fetchHealthTips();

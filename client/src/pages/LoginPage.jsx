@@ -67,12 +67,9 @@ const LoginPage = () => {
       // Pass role to ensure role-based login restriction
       await login(formData.email, formData.password, role);
 
-      // Redirect based on role
-      // User goes to welcome screen first, Admin goes directly to dashboard
+      // Force navigation using window.location for mobile compatibility
       const redirectPath = role === 'admin' ? '/admin-dashboard' : '/welcome';
-      setTimeout(() => {
-        navigate(redirectPath);
-      }, 500);
+      window.location.href = redirectPath;
     } catch (err) {
       // Error is handled by authError from useAuth
       // Ensure error message is captured from backend response

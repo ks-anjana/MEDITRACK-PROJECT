@@ -19,22 +19,29 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (!isAuthenticated() || !isAdmin()) {
-      navigate('/login');
+      window.location.href = '/login';
       return;
     }
 
     fetchDashboardData();
-  }, [navigate]);
+  }, []);
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
       const response = await adminAPI.getDashboard();
-      setStats(response.data);
+      setStats({
+        userCount: response?.data?.userCount || 0,
+        tipsCount: response?.data?.tipsCount || 0,
+        adsCount: response?.data?.adsCount || 0,
+        feedbackCount: response?.data?.feedbackCount || 0,
+        tips: response?.data?.tips || []
+      });
       setError('');
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
       setError(err.response?.data?.message || 'Failed to load dashboard data');
+      // Keep default stats on error
     } finally {
       setLoading(false);
     }
@@ -42,7 +49,7 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     clearAuthData();
-    navigate('/login');
+    window.location.href = '/login';
   };
 
   const handleNavigate = (path) => {
@@ -66,7 +73,7 @@ const AdminDashboard = () => {
             👨‍💼 Admin Dashboard
           </h1>
           <div className="flex items-center gap-4">
-            <span className="text-blue-300 font-semibold">Welcome, {adminName}!</span>
+            <span className="text-blue-300 font-semibold">Welcome, {adminName || 'Admin'}!</span>
             <button onClick={handleLogout} className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold shadow-md">
               Logout
             </button>
@@ -89,7 +96,7 @@ const AdminDashboard = () => {
             <div className="flex justify-between items-start">
               <div>
                 <div className="text-blue-300 text-sm font-semibold">Total Users</div>
-                <div className="text-4xl font-bold text-white mt-2">{stats.userCount}</div>
+                <div className="text-4xl font-bold text-white mt-2">{stats?.userCount || 0}</div>
               </div>
               <div className="text-4xl">👥</div>
             </div>
@@ -101,7 +108,7 @@ const AdminDashboard = () => {
             <div className="flex justify-between items-start">
               <div>
                 <div className="text-green-300 text-sm font-semibold">Health Tips</div>
-                <div className="text-4xl font-bold text-white mt-2">{stats.tipsCount}</div>
+                <div className="text-4xl font-bold text-white mt-2">{stats?.tipsCount || 0}</div>
               </div>
               <div className="text-4xl">💡</div>
             </div>
@@ -113,7 +120,7 @@ const AdminDashboard = () => {
             <div className="flex justify-between items-start">
               <div>
                 <div className="text-blue-300 text-sm font-semibold">Advertisements</div>
-                <div className="text-4xl font-bold text-white mt-2">{stats.adsCount}</div>
+                <div className="text-4xl font-bold text-white mt-2">{stats?.adsCount || 0}</div>
               </div>
               <div className="text-4xl">📢</div>
             </div>
@@ -125,7 +132,7 @@ const AdminDashboard = () => {
             <div className="flex justify-between items-start">
               <div>
                 <div className="text-orange-300 text-sm font-semibold">Feedback</div>
-                <div className="text-4xl font-bold text-white mt-2">{stats.feedbackCount}</div>
+                <div className="text-4xl font-bold text-white mt-2">{stats?.feedbackCount || 0}</div>
               </div>
               <div className="text-4xl">💬</div>
             </div>

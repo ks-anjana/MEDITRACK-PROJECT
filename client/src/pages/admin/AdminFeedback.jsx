@@ -14,7 +14,7 @@ const AdminFeedback = () => {
 
   useEffect(() => {
     if (!isAuthenticated() || !isAdmin()) {
-      navigate('/login');
+      window.location.href = '/login';
       return;
     }
     fetchAllFeedback();
@@ -75,7 +75,7 @@ const AdminFeedback = () => {
 
   const handleLogout = () => {
     clearAuthData();
-    navigate('/login');
+    window.location.href = '/login';
   };
 
   const handleDeleteReply = async (feedbackId) => {

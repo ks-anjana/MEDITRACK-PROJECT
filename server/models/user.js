@@ -24,6 +24,22 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user',
   },
+  fcmTokens: [
+    {
+      token: {
+        type: String,
+        trim: true,
+      },
+      platform: {
+        type: String,
+        default: 'web',
+      },
+      updatedAt: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,

@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const Medicine = require('../models/Medicine');
 const Appointment = require('../models/Appointment');
+const { sendPushNotification, extractUserTokens } = require('./pushNotifier');
 
 // Global alerts storage
 let medicineAlerts = [];
@@ -83,7 +84,7 @@ const startCronJobs = () => {
 // Check medicine reminders
 const checkMedicineReminders = async (currentTime) => {
   try {
-    const medicines = await Medicine.find().populate('userId', 'name email');
+    const medicines = await Medicine.find().populate('userId', 'name email fcmTokens');
     
     let matchCount = 0;
     
@@ -123,6 +124,20 @@ const checkMedicineReminders = async (currentTime) => {
           console.log(`   👤 User: ${medicine.userId.name} (${medicine.userId.email})`);
           console.log(`   ⏰ Time: ${medicine.time} (${medicine24HourTime})`);
           console.log(`   🍽️  Food Timing: ${medicine.foodTiming}`);
+
+          const tokens = extractUserTokens([medicine.userId]);
+          await sendPushNotification({
+            tokens,
+            title: 'Medicine Reminder',
+            body: `Time to take ${medicine.medicineName} - ${medicine.foodTiming}`,
+            data: {
+              type: 'medicine',
+              medicineId: medicine._id.toString(),
+              medicineName: medicine.medicineName,
+              foodTiming: medicine.foodTiming,
+            },
+            tag: alert.key,
+          });
         }
       }
     }
@@ -143,7 +158,7 @@ const checkMedicineReminders = async (currentTime) => {
 // Check appointment reminders
 const checkAppointmentReminders = async (currentTime, currentDate) => {
   try {
-    const appointments = await Appointment.find().populate('userId', 'name email');
+    const appointments = await Appointment.find().populate('userId', 'name email fcmTokens');
     
     let matchCount = 0;
     
@@ -186,6 +201,20 @@ const checkAppointmentReminders = async (currentTime, currentDate) => {
           console.log(`   👤 User: ${appointment.userId.name} (${appointment.userId.email})`);
           console.log(`   📆 Date: ${currentDate}`);
           console.log(`   ⏰ Time: ${appointment.appointmentTime} (${appointment24HourTime})`);
+
+          const tokens = extractUserTokens([appointment.userId]);
+          await sendPushNotification({
+            tokens,
+            title: 'Appointment Reminder',
+            body: `Appointment with Dr. ${appointment.doctorName} at ${appointment.hospitalName}`,
+            data: {
+              type: 'appointment',
+              appointmentId: appointment._id.toString(),
+              doctorName: appointment.doctorName,
+              hospitalName: appointment.hospitalName,
+            },
+            tag: alert.key,
+          });
         }
       }
     }

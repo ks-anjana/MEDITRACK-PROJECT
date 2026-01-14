@@ -32,9 +32,9 @@ const Login = () => {
 
       // Redirect based on role
       if (user.role === 'admin') {
-        navigate('/admin-dashboard');
+        window.location.href = '/admin-dashboard';
       } else {
-        navigate('/user-dashboard');
+        window.location.href = '/user-dashboard';
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');

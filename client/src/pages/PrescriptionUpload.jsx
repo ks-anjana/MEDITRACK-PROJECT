@@ -23,7 +23,7 @@ const PrescriptionUpload = () => {
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate('/login');
+      window.location.href = '/login';
       return;
     }
     fetchPrescriptions();

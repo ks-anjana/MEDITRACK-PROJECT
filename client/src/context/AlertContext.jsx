@@ -104,15 +104,12 @@ export const AlertProvider = ({ children }) => {
 
     setIsInitialized(true);
 
-    // Check immediately
-    checkAlerts();
-
-    // Set up polling interval (every 10 seconds)
+    // Set up polling interval (every 60 seconds / 1 minute)
     pollingIntervalRef.current = setInterval(() => {
       checkAlerts();
-    }, 10000);
+    }, 60000);
 
-    console.log('🟢 [ALERT] Alert polling started (every 10 seconds)');
+    console.log('🟢 [ALERT] Alert polling started (every 60 seconds)');
 
     // Cleanup on unmount
     return () => {

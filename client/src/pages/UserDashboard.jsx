@@ -12,20 +12,40 @@ const UserDashboard = () => {
   const [error, setError] = useState('');
   const [ads, setAds] = useState([]);
 
+  const handleEnableNotifications = async () => {
+    if (!('Notification' in window)) {
+      alert('Notifications blocked');
+      return;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        alert('Notifications enabled');
+      } else {
+        alert('Notifications blocked');
+      }
+    } catch (err) {
+      console.error('Notification permission error:', err);
+      alert('Notifications blocked');
+    }
+  };
+
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate('/login');
+      window.location.href = '/login';
       return;
     }
     fetchAds();
-  }, [navigate]);
+  }, []);
 
   const fetchAds = async () => {
     try {
       const response = await advertisementAPI.getAll();
-      setAds(response.data || []);
+      setAds(response?.data || []);
     } catch (error) {
       console.error('Error fetching ads:', error);
+      setAds([]); // Ensure ads is always an array
     }
   };
 
@@ -35,7 +55,7 @@ const UserDashboard = () => {
 
   const handleLogout = () => {
     clearAuthData();
-    navigate('/login');
+    window.location.href = '/login';
   };
 
   const handleDeleteAccount = async () => {
@@ -44,7 +64,7 @@ const UserDashboard = () => {
       setError('');
       await userAPI.deleteAccount();
       clearAuthData();
-      navigate('/login');
+      window.location.href = '/login';
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete account');
       setLoading(false);
@@ -65,15 +85,23 @@ const UserDashboard = () => {
                 Welcome to MediTrack
               </h1>
               <p className="text-lg text-cyan-100 mt-2">
-                Hello, <span className="font-semibold text-white">{userName}</span>! 👋
+                Hello, <span className="font-semibold text-white">{userName || 'User'}</span>! 👋
               </p>
             </div>
-            <button
-              onClick={handleLogout}
-              className="bg-white text-cyan-700 px-6 py-3 rounded-lg hover:bg-cyan-50 transition-all duration-200 font-semibold shadow-md"
-            >
-              Logout
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={handleEnableNotifications}
+                className="bg-white text-cyan-700 px-6 py-3 rounded-lg hover:bg-cyan-50 transition-all duration-200 font-semibold shadow-md"
+              >
+                Enable Notifications
+              </button>
+              <button
+                onClick={handleLogout}
+                className="bg-white text-cyan-700 px-6 py-3 rounded-lg hover:bg-cyan-50 transition-all duration-200 font-semibold shadow-md"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -146,30 +174,31 @@ const UserDashboard = () => {
         </div>
 
         {/* Advertisements Section */}
-        {ads.length > 0 && (
+        {ads && ads.length > 0 && (
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
               <span>📢</span>
               Sponsored Content
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {ads.map((ad) => (
+              {ads.map((ad) => ad && ad._id ? (
                 <div
                   key={ad._id}
                   onClick={() => handleAdClick(ad.redirectUrl)}
                   className="bg-gray-800 rounded-xl shadow-md hover:shadow-xl hover:shadow-cyan-500/20 transition-all duration-300 cursor-pointer transform hover:-translate-y-1 overflow-hidden border border-slate-700"
                 >
                   <img 
-                    src={ad.image} 
-                    alt={ad.title}
+                    src={ad.image || '/placeholder.png'} 
+                    alt={ad.title || 'Advertisement'}
                     className="w-full h-40 object-cover"
+                    onError={(e) => { e.target.style.display = 'none'; }}
                   />
                   <div className="p-4">
-                    <h3 className="font-bold text-lg text-white">{ad.title}</h3>
+                    <h3 className="font-bold text-lg text-white">{ad.title || 'Sponsored'}</h3>
                     <p className="text-xs text-gray-400 mt-1">✨ Sponsored Content</p>
                   </div>
                 </div>
-              ))}
+              ) : null)}
             </div>
           </div>
         )}

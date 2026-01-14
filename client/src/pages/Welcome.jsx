@@ -16,7 +16,7 @@ const Welcome = () => {
   }, [navigate]);
 
   const handleContinue = () => {
-    navigate('/user-dashboard');
+    window.location.href = '/user-dashboard';
   };
 
   return (

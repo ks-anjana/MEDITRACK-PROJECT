@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { deleteAccount, getAdminStats } = require('../controllers/UserController');
+const { deleteAccount, getAdminStats } = require('../controllers/userController');
 const { protect } = require('../middleware/auth');
 const { adminOnly } = require('../middleware/roleAuth');
 

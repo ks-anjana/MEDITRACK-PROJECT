@@ -8,6 +8,9 @@ dotenv.config();
 
 const app = express();
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
 /* =========================================================
    ✅ SINGLE & CORRECT CORS CONFIG (FINAL)
 ========================================================= */

@@ -4,8 +4,10 @@ const User = require('../models/User.js');
 // Get all health tips
 exports.getHealthTips = async (req, res) => {
   try {
-    const isAdminUser = req.user && req.user.role === 'admin';
-    // Admin sees all tips, users only see published tips (regardless of isDefault)
+    const isAdminUser =
+    req.user &&
+    (req.user.role === 'admin' || req.user.isAdmin === true);
+      // Admin sees all tips, users only see published tips (regardless of isDefault)
     const query = isAdminUser ? {} : { isPublished: true };
 
     const tips = await HealthTip.find(query)

@@ -3,7 +3,7 @@ import API_BASE_URL from '../config/apiConfig';
 
 // Create axios instance
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: `${API_BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },

@@ -6,21 +6,31 @@ const medicineSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+
   medicineName: {
     type: String,
-    required: [true, 'Please provide medicine name'],
+    required: true,
     trim: true,
   },
-  time: {
-    type: String,
-    required: [true, 'Please provide time'],
-    trim: true,
-  },
+
   foodTiming: {
     type: String,
     enum: ['before food', 'after food'],
-    required: [true, 'Please provide food timing'],
+    required: true,
   },
+
+  // 🔥 NEW: Full timestamp instead of string time
+  reminderAt: {
+    type: Date,
+    required: true,
+  },
+
+  // 🔄 NEW: Repeat every day (optional)
+  repeatDaily: {
+    type: Boolean,
+    default: true,
+  },
+
   createdAt: {
     type: Date,
     default: Date.now,

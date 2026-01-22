@@ -1,9 +1,28 @@
 import axios from 'axios';
 import API_BASE_URL from '../config/apiConfig';
 
+// Resolve and normalize baseURL once at startup
+let resolvedBaseURL = API_BASE_URL;
+try {
+  if (typeof resolvedBaseURL !== 'string') {
+    throw new Error('VITE_API_BASE_URL must be a string');
+  }
+  // Trim trailing slashes
+  const trimmed = resolvedBaseURL.replace(/\/$/, '');
+  // If someone mistakenly added '/api' in env, remove it here to avoid '/api/api'
+  resolvedBaseURL = trimmed.replace(/\/api\/?$/i, '');
+  // Final axios base includes '/api'
+  resolvedBaseURL = `${resolvedBaseURL}/api`;
+  // Normalize any accidental double '/api/api'
+  resolvedBaseURL = resolvedBaseURL.replace(/\/api\/api$/i, '/api');
+  console.log(`🔧 API baseURL resolved: ${resolvedBaseURL}`);
+} catch (e) {
+  console.error('❌ Failed to resolve API baseURL:', e.message);
+}
+
 // Create axios instance
 const api = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
+  baseURL: resolvedBaseURL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -63,7 +82,7 @@ api.interceptors.response.use(
       }
     } else if (error.request) {
       console.error('❌ No response from server');
-      console.error('Base URL:', API_BASE_URL);
+      console.error('Base URL:', resolvedBaseURL);
     } else {
       console.error('❌ Axios error:', error.message);
     }

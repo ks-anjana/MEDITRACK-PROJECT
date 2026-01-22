@@ -104,6 +104,9 @@ export const AlertProvider = ({ children }) => {
 
     setIsInitialized(true);
 
+    // Immediate check on mount
+    checkAlerts();
+
     // Set up polling interval (every 60 seconds / 1 minute)
     pollingIntervalRef.current = setInterval(() => {
       checkAlerts();
@@ -121,7 +124,20 @@ export const AlertProvider = ({ children }) => {
         clearTimeout(checkTimeoutRef.current);
       }
     };
-  }, []); // Empty dependency array - run once on mount
+  }, [checkAlerts]); // Empty dependency array - run once on mount
+
+  // Also trigger immediate check when token becomes available (after login)
+  useEffect(() => {
+    const onStorageChange = () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        console.log('🟢 [ALERT] Token detected, performing immediate alert check');
+        checkAlerts();
+      }
+    };
+    window.addEventListener('storage', onStorageChange);
+    return () => window.removeEventListener('storage', onStorageChange);
+  }, [checkAlerts]);
 
   // Close/dismiss alerts
   const dismissAlerts = useCallback(() => {
@@ -140,23 +156,17 @@ export const AlertProvider = ({ children }) => {
 };
 
 /**
- * Show browser notification
+ * Show browser notification (with toast fallback)
  */
 const showBrowserNotification = (alert) => {
   try {
+    const title = alert.type === 'medicine' ? '💊 Medicine Reminder' : '📅 Appointment Reminder';
+    const body = alert.type === 'medicine'
+      ? `Time to take: ${alert.medicineName}\n${alert.foodTiming}`
+      : `Appointment with Dr. ${alert.doctorName}\nat ${alert.hospitalName}`;
+    const icon = alert.type === 'medicine' ? '/medicine-icon.png' : '/appointment-icon.png';
+
     if ('Notification' in window && Notification.permission === 'granted') {
-      let title, body, icon;
-
-      if (alert.type === 'medicine') {
-        title = '💊 Medicine Reminder';
-        body = `Time to take: ${alert.medicineName}\n${alert.foodTiming}`;
-        icon = '/medicine-icon.png';
-      } else {
-        title = '📅 Appointment Reminder';
-        body = `Appointment with Dr. ${alert.doctorName}\nat ${alert.hospitalName}`;
-        icon = '/appointment-icon.png';
-      }
-
       const notification = new Notification(title, {
         body,
         icon,
@@ -164,13 +174,19 @@ const showBrowserNotification = (alert) => {
         tag: alert.key,
         requireInteraction: true,
       });
-
       notification.onclick = () => {
         window.focus();
         notification.close();
       };
-      
       console.log('🔔 [ALERT] Browser notification shown:', title);
+    } else {
+      // Fallback toast/UI when notifications are blocked/denied
+      console.warn('⚠️  [ALERT] Notifications not permitted; showing fallback');
+      try {
+        // If you have a global toast system, trigger it here
+        // toast.info(`${title}: ${body}`);
+        alert(`${title}\n\n${body}`);
+      } catch {}
     }
   } catch (err) {
     console.error('❌ [ALERT] Error showing browser notification:', err);

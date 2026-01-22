@@ -17,9 +17,9 @@ const generateToken = (id) => {
    =========================== */
 const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role = 'user' } = req.body; // allow role (default 'user')
 
-    console.log('📝 Registration attempt:', { name, email });
+    console.log('📝 Registration attempt:', { name, email, role });
 
     // Validation
     if (!name || !email || !password) {
@@ -35,27 +35,28 @@ const register = async (req, res) => {
     }
 
     // Check existing user
-    const existingUser = await User.findOne({
-      email: email.toLowerCase(),
-    });
-
+    const existingUser = await User.findOne({ email: (email || '').toLowerCase() });
     if (existingUser) {
-      return res.status(400).json({
-        message: 'Account already exists',
+      // Spec requires 409 with exact message
+      return res.status(409).json({
+        message: 'User already registered',
       });
     }
 
+    // Sanitize role
+    const normalizedRole = role === 'admin' ? 'admin' : 'user';
+
     // Create user
-    await User.create({
+    const created = await User.create({
       name,
       email: email.toLowerCase(),
       password,
-      role: 'user',
+      role: normalizedRole,
     });
 
-    console.log('✅ User registered successfully:', email);
+    console.log('✅ User registered successfully:', created.email);
 
-    // No auto-login (as per your logic)
+    // No auto-login
     return res.status(201).json({
       message: 'Registration successful! Please login to continue.',
     });
@@ -83,37 +84,36 @@ const login = async (req, res) => {
     }
 
     // Find user
-    const user = await User.findOne({
-      email: email.toLowerCase(),
-    });
+    const user = await User.findOne({ email: (email || '').toLowerCase() });
 
+    // Spec: if email does not exist → 401 'Invalid email or password'
     if (!user) {
       console.log('❌ User not found:', email);
-      return res.status(401).json({
-        message: 'Account does not exist',
-      });
-    }
-
-    // Password check
-    const isPasswordMatch = await user.matchPassword(password);
-
-    if (!isPasswordMatch) {
-      console.log('❌ Invalid password for:', email);
       return res.status(401).json({
         message: 'Invalid email or password',
       });
     }
 
-    // Role-based login restriction
+    // Password check
+    const isPasswordMatch = await user.matchPassword(password);
+    if (!isPasswordMatch) {
+      console.log('❌ Invalid password for:', email);
+      // Spec: 401 with same message
+      return res.status(401).json({
+        message: 'Invalid email or password',
+      });
+    }
+
+    // Role-based login restriction per spec
     if (role && user.role !== role) {
-      if (role === 'admin') {
+      if (role === 'admin' && user.role === 'user') {
         return res.status(403).json({
-          message: 'This account does not have admin access',
+          message: 'User cannot login here',
         });
       }
-      if (role === 'user') {
+      if (role === 'user' && user.role === 'admin') {
         return res.status(403).json({
-          message: 'Admin accounts must login from Admin Login page',
+          message: 'Admin cannot login here',
         });
       }
     }

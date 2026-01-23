@@ -71,9 +71,9 @@ const LoginPage = () => {
       const redirectPath = role === 'admin' ? '/admin-dashboard' : '/welcome';
       window.location.href = redirectPath;
     } catch (err) {
-      // Error is handled by authError from useAuth
-      // Ensure error message is captured from backend response
+      // Show native alert with backend-provided message
       const errorMessage = err.response?.data?.message || 'Something went wrong';
+      window.alert(errorMessage);
       console.error('Login error:', errorMessage);
     }
   };
@@ -128,6 +128,10 @@ const LoginPage = () => {
         <div className={`${formBg} rounded-xl shadow-xl p-8 border ${borderColor}`}>
           {authError && (
             <div className="mb-6">
+              {(() => {
+                // Also trigger a native alert when authError is set
+                try { if (authError) window.alert(authError); } catch {}
+              })()}
               <Alert
                 type="error"
                 message={authError}

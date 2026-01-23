@@ -94,9 +94,9 @@ const RegisterPage = () => {
       // Clear any auto-login side effects from the register call
       logout();
     } catch (err) {
-      // Error is handled by authError from useAuth
-      // Ensure error message is captured from backend response
+      // Show native alert with backend-provided message (e.g., 'User already registered')
       const errorMessage = err.response?.data?.message || err.message || 'Registration failed';
+      window.alert(errorMessage);
       console.error('Registration error:', errorMessage);
     }
   };

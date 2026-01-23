@@ -18,7 +18,31 @@ const appointmentSchema = new mongoose.Schema(
       trim: true,
     },
 
-    // ✅ SINGLE SOURCE OF TRUTH (UTC)
+    // ✅ Store date in ISO format (YYYY-MM-DD)
+    appointmentDate: {
+      type: String,
+      required: true,
+      validate: {
+        validator: function(v) {
+          return /^\d{4}-\d{2}-\d{2}$/.test(v);
+        },
+        message: 'Date must be in YYYY-MM-DD format'
+      }
+    },
+
+    // ✅ Store time in 12-hour format with AM/PM (e.g., "10:30 AM")
+    appointmentTime: {
+      type: String,
+      required: true,
+      validate: {
+        validator: function(v) {
+          return /^\d{1,2}:\d{2}\s?(AM|PM)$/i.test(v);
+        },
+        message: 'Time must be in format HH:MM AM/PM'
+      }
+    },
+
+    // ✅ Store combined UTC date for easy sorting/filtering
     appointmentAt: {
       type: Date,
       required: true,

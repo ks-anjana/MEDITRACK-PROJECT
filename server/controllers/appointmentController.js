@@ -1,10 +1,10 @@
 const Appointment = require('../models/Appointment');
 
 /**
- * ADD APPOINTMENT (UTC SAFE)
+ * ADD APPOINTMENT
  * Frontend sends:
- *  appointmentDate: "2026-01-18"
- *  appointmentTime: "11:28 AM"
+ *  appointmentDate: "2026-01-18" (YYYY-MM-DD)
+ *  appointmentTime: "11:28 AM" (HH:MM AM/PM)
  */
 exports.addAppointment = async (req, res) => {
   try {
@@ -32,24 +32,39 @@ exports.addAppointment = async (req, res) => {
       return res.status(400).json({ message: 'Please provide appointment time' });
     }
 
-    // ===== CONVERT LOCAL TIME → UTC DATE =====
-    const localDateTime = new Date(`${appointmentDate} ${appointmentTime}`);
-
-    if (isNaN(localDateTime.getTime())) {
-      return res.status(400).json({ message: 'Invalid date or time format' });
+    // ===== VALIDATE DATE FORMAT (YYYY-MM-DD) =====
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(appointmentDate)) {
+      return res.status(400).json({ message: 'Invalid date format. Use YYYY-MM-DD' });
     }
 
-    const appointmentAt = new Date(
-      localDateTime.getTime() - localDateTime.getTimezoneOffset() * 60000
-    );
+    // ===== VALIDATE TIME FORMAT (HH:MM AM/PM) =====
+    const timeRegex = /^\d{1,2}:\d{2}\s?(AM|PM)$/i;
+    if (!timeRegex.test(appointmentTime.trim())) {
+      return res.status(400).json({ message: 'Invalid time format. Use HH:MM AM/PM' });
+    }
+
+    // ===== VALIDATE DATE IS VALID =====
+    const dateObj = new Date(appointmentDate + ' ' + appointmentTime);
+    if (isNaN(dateObj.getTime())) {
+      return res.status(400).json({ message: 'Invalid date or time provided' });
+    }
+
+    // ===== CHECK DATE IS NOT IN THE PAST =====
+    const now = new Date();
+    if (dateObj < now) {
+      return res.status(400).json({ message: 'Cannot schedule appointment in the past' });
+    }
 
     // ===== SAVE APPOINTMENT =====
     const appointment = await Appointment.create({
       userId: req.user._id,
       doctorName: doctorName.trim(),
       hospitalName: hospitalName.trim(),
-      appointmentAt,       // ✅ UTC date
-      alertSent: false,    // ✅ alert flag
+      appointmentDate: appointmentDate.trim(),
+      appointmentTime: appointmentTime.trim(),
+      appointmentAt: dateObj,  // Combined date for sorting
+      alertSent: false,
     });
 
     res.status(201).json({

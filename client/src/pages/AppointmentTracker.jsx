@@ -17,7 +17,6 @@ const AppointmentTracker = () => {
     hospitalName: '',
     appointmentDate: '',
     appointmentTime: '',
-    ampm: 'AM',
   });
 
   const [errors, setErrors] = useState({});
@@ -111,11 +110,24 @@ const AppointmentTracker = () => {
       setErrorMessage('');
       setSuccessMessage('');
       
-      // Combine time with AM/PM
-      const fullTime = formData.appointmentTime + ' ' + formData.ampm;
+      // Convert 24-hour time to 12-hour format with AM/PM
+      const convertTo12Hour = (time24) => {
+        const [hoursStr, minutesStr] = time24.split(':');
+        let hours = parseInt(hoursStr, 10);
+        const minutes = minutesStr;
+        
+        let period = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12; // Convert 0 to 12 for midnight
+        
+        return `${hours}:${minutes} ${period}`;
+      };
+      
+      const fullTime = convertTo12Hour(formData.appointmentTime);
       
       await appointmentAPI.add({
-        ...formData,
+        doctorName: formData.doctorName,
+        hospitalName: formData.hospitalName,
+        appointmentDate: formData.appointmentDate,
         appointmentTime: fullTime,
       });
 
@@ -125,7 +137,6 @@ const AppointmentTracker = () => {
         hospitalName: '',
         appointmentDate: '',
         appointmentTime: '',
-        ampm: 'AM',
       });
       setErrors({});
 
@@ -162,7 +173,30 @@ const AppointmentTracker = () => {
 
   // Format date for display
   const formatDate = (dateString) => {
+    if (!dateString) return 'Invalid Date';
+    
+    // If dateString is in ISO format (YYYY-MM-DD)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      const [year, month, day] = dateString.split('-');
+      const date = new Date(year, parseInt(month) - 1, day);
+      
+      if (isNaN(date.getTime())) {
+        return 'Invalid Date';
+      }
+      
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    }
+    
+    // Fallback for other date formats
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return 'Invalid Date';
+    }
+    
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -290,37 +324,21 @@ const AppointmentTracker = () => {
               )}
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <div className="col-span-2">
-                <label className="block text-sm font-semibold text-gray-200 mb-2">
-                  Appointment Time <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="time"
-                  name="appointmentTime"
-                  value={formData.appointmentTime}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-slate-600 bg-slate-900 text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2">
-                  AM/PM
-                </label>
-                <select
-                  name="ampm"
-                  value={formData.ampm}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-slate-600 bg-slate-900 text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition-all"
-                >
-                  <option value="AM">AM</option>
-                  <option value="PM">PM</option>
-                </select>
-              </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-200 mb-2">
+                Appointment Time <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="time"
+                name="appointmentTime"
+                value={formData.appointmentTime}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-slate-600 bg-slate-900 text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition-all"
+              />
+              {errors.appointmentTime && (
+                <p className="text-red-500 text-sm mt-1">{errors.appointmentTime}</p>
+              )}
             </div>
-            {errors.appointmentTime && (
-              <p className="text-red-500 text-sm">{errors.appointmentTime}</p>
-            )}
 
             <button 
               type="submit" 
@@ -363,10 +381,10 @@ const AppointmentTracker = () => {
                           <span className="font-semibold">🏥</span> <strong>Hospital:</strong> {appointment.hospitalName}
                         </p>
                         <p className="flex items-center gap-2">
-                          <span className="font-semibold">📆</span> <strong>Date:</strong> {formatDate(appointment.appointmentDate)}
+                          <span className="font-semibold">📆</span> <strong>Date:</strong> {appointment.appointmentDate ? formatDate(appointment.appointmentDate) : 'Invalid Date'}
                         </p>
                         <p className="flex items-center gap-2">
-                          <span className="font-semibold">⏰</span> <strong>Time:</strong> {appointment.appointmentTime}
+                          <span className="font-semibold">⏰</span> <strong>Time:</strong> {appointment.appointmentTime || 'No time set'}
                         </p>
                       </div>
                     </div>
